@@ -36,7 +36,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-multiselect/1.1.1/js/bootstrap-multiselect.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-multiselect/1.1.1/css/bootstrap-multiselect.css">
 
-    <div class="container-fluid p-10" style="height:100%">
+    <div class="container-fluid p-20" style="height:100%">
         <div class="row flex-nowrap" style="height:100%">
 
             <!-- sidebar -->
@@ -53,12 +53,10 @@
                         <div style="padding-left:10px; padding-bottom:10px; text-align: center;">
                             <label>Feature selection</label>
                             <select id="featureSelect" multiple>
-                                <optgroup label="Attributes">
-                                    <option value="sepal_length" selected="selected">Sepal Length</option>
-                                    <option value="sepal_width" selected="selected">Sepal Width</option>
-                                    <option value="petal_length" selected="selected">Petal Length</option>
-                                    <option value="petal_width" selected="selected">Petal Width</option>
-                                </optgroup>
+                                <option value="sepal_length" selected="selected">Sepal Length</option>
+                                <option value="sepal_width" selected="selected">Sepal Width</option>
+                                <option value="petal_length" selected="selected">Petal Length</option>
+                                <option value="petal_width" selected="selected">Petal Width</option>
                         </select>
                         </div>
                         <hr class="line">
@@ -156,7 +154,7 @@
                     <svg class="svg1" id="chart1"></svg>
                     <svg class="svg2" id="chart2"></svg>
                 </div>
-
+                
                 <a data-toggle="collapse" href="#" data-target="#sidebar" aria-expanded="false" id="menu">Menu</a>
             </main>
         </div>
@@ -452,11 +450,11 @@
                     url: "/dimReduceIds",
                     success: function(status) {
                         if (status === "status1:fileUpdated") {
-                            console.log("FeatureData file updated")
+                            // console.log("FeatureData file updated")
                         }
                         if (status === "status2:singleColumn") {
                             alert("Please select more than one column in Feature selection drop down!!!")
-                            console.log("FeatureData file reset: single column selected")
+                            // console.log("FeatureData file reset: single column selected")
                         }
                     }
                 })

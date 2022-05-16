@@ -10,7 +10,7 @@ function plotGlyphs(glyphsChart, parallelCordChart, selectedId, featurelist, rad
         strokeWidthLow: 0.4 * scale,
         strokeWidthHigh: 2 * scale,
         fillColor: "transparent",
-        fillColorHover: "#636363",
+        fillColorLasso: "#636363",
         petals: 4, //no of petals in the glyph
         labelSize: radius / 2, //size of labels to show over the glyphs
         // d: "M37.92,42.22c3.78-8,7-14.95,12.08-14.95h0c5,0,8.3,6.93,12.08,14.95,6.12,13,13.73,29.13,33.48,29.13h0v-2h0c-18.48,0-25.79-15.51-31.67-28C59.82,32.74,56.3,25.28,50,25.28h0c-6.3,0-9.82,7.46-13.89,16.09-5.88,12.47-13.19,28-31.67,28h0v2h0C24.18,71.35,31.8,55.2,37.92,42.22Z",
@@ -36,7 +36,7 @@ function plotGlyphs(glyphsChart, parallelCordChart, selectedId, featurelist, rad
                 d.y = +d.y
                 d.id = +d.id
             });
-            const margin = { left: 5, top: 5, right: 70, bottom: 5 },
+            const margin = { left: 5, top: 15, right: 70, bottom: 5 },
                 width = $("#" + glyphsChart).width(),
                 height = $("#" + glyphsChart).height()
 
@@ -53,15 +53,15 @@ function plotGlyphs(glyphsChart, parallelCordChart, selectedId, featurelist, rad
             const svgButtons = svg.append("g").attr("class", "svgButtons").attr("transform", `translate(${margin.left + margin.right-22},${margin.bottom - 2})`);
 
             // Add a title.
-            var title = svg.append("text")
-            .attr("x", width / 2)
-            .attr("y", "15px")
-            .style("fill", "rgb(18, 113, 249)")
-            .style("font-size", "15px")
-            .style("font-weight", "normal")
-            .style("text-anchor", "middle")
-            .text(titleText)
-            .lower();
+            svg.append("text")
+                .attr("x", width / 2)
+                .attr("y", "15px")
+                .style("fill", "rgb(18, 113, 249)")
+                .style("font-size", "15px")
+                .style("font-weight", "normal")
+                .style("text-anchor", "middle")
+                .text(titleText)
+                .lower();
 
             // rect to assist with zoom and pan
             svgGlyphs.append("rect")
@@ -83,13 +83,11 @@ function plotGlyphs(glyphsChart, parallelCordChart, selectedId, featurelist, rad
                 .attr("y1", 0)
                 .attr("x2", function(d) { return d; })
                 .attr("y2", height)
-                .style("stroke", "black")
-                .style("stroke-width", (d, i) => {
-                    return i % Math.ceil(100 / config.grid_size) == 0 ? config.strokeWidthLow / 2 : config.strokeWidthLow / 2
-                })
                 .style("opacity", (d, i) => {
                     return i % Math.ceil(100 / config.grid_size) == 0 ? config.opacityLow * 2 : config.opacityLow
-                });
+                })
+                .style("stroke", "black")
+                .style("stroke-width", config.strokeWidthLow);
 
             svgGrid.append("g").attr("class", "horizontal")
                 .selectAll("line")
@@ -99,19 +97,17 @@ function plotGlyphs(glyphsChart, parallelCordChart, selectedId, featurelist, rad
                 .attr("y1", function(d) { return d; })
                 .attr("x2", width)
                 .attr("y2", function(d) { return d; })
-                .style("stroke", "black")
-                .style("stroke-width", (d, i) => {
-                    return i % Math.ceil(100 / config.grid_size) == 0 ? config.strokeWidthLow / 2 : config.strokeWidthLow / 2
-                })
                 .style("opacity", (d, i) => {
                     return i % Math.ceil(100 / config.grid_size) == 0 ? config.opacityLow * 2 : config.opacityLow
-                });
+                })
+                .style("stroke", "black")
+                .style("stroke-width", config.strokeWidthLow);
 
             // Legends
             var legendOrdinal = d3.legendColor()
-                .shapePadding(5)
+                .shapePadding(10)
                 .shapeWidth(20)
-                .shapeHeight(20)
+                .shapeHeight(30)
                 .cellFilter(function(d) { return d.label !== "e" })
                 .scale(colorClusters)
                 .on("cellover", () => {
@@ -120,23 +116,23 @@ function plotGlyphs(glyphsChart, parallelCordChart, selectedId, featurelist, rad
                 .on("cellclick", function(e) {
                     d3.selectAll(".hovercircle")
                         .classed("selectedLasso", false)
-                        .style("fill", config.fillColor)
+                        .attr("opacity", d => { return d.id == selectedId ? config.opacityHigh : config.opacityLow })
                         .attr("stroke", "black")
                         .attr("stroke-width", d => { return d.id == selectedId ? config.strokeWidthHigh : config.strokeWidthLow })
-                        .attr("opacity", d => { return d.id == selectedId ? config.opacityHigh : config.opacityLow })
+                        .style("fill", config.fillColor)
 
                     d3.selectAll(".hovercircle")
                         .filter(d => { return d["variety"] == e })
                         .classed("selectedLasso", true)
-                        .style("fill", d => {
-                            return (d.id == selectedId) ? "#bdbdbd" : config.fillColorHover
-                        })
                         .attr("opacity", d => {
                             return (d.id == selectedId) ? config.opacityClickHigh : config.opacityClickLow
                         })
                         .attr("stroke", "black")
                         .attr("stroke-width", d => {
                             return (d.id == selectedId) ? config.strokeWidthHigh : config.strokeWidthHigh / 3
+                        })
+                        .style("fill", d => {
+                            return (d.id == selectedId) ? config.fillColorLasso : config.fillColorLasso
                         })
                     plotParallelCord()
                 })
@@ -146,7 +142,7 @@ function plotGlyphs(glyphsChart, parallelCordChart, selectedId, featurelist, rad
             
             svg.append("g")
                 .attr("class", "legendOrdinal")
-                .attr("transform", `translate(${width - 60}, ${10 + margin.top}) scale(${1/2})`)
+                .attr("transform", `translate(${width - 65}, ${5}) scale(${1/2})`)
                 .call(legendOrdinal)
                 .style("opacity", config.opacityHigh);
 
@@ -229,10 +225,6 @@ function plotGlyphs(glyphsChart, parallelCordChart, selectedId, featurelist, rad
                         // SVG Semantic Zooming
                 }
 
-                function scaleBetween(unscaledNum, minAllowed, maxAllowed, min, max) {
-                    return (maxAllowed - minAllowed) * (unscaledNum - min) / (max - min) + minAllowed;
-                }
-
                 function plotRadialGlyph() {
                     // RadialGlyph
                     svgGlyphs.append("g").attr("class", "glyphs")
@@ -247,6 +239,7 @@ function plotGlyphs(glyphsChart, parallelCordChart, selectedId, featurelist, rad
                                 .data([d])
                                 .enter()
                                 .append("path")
+                                .attr("class", function(d) { return d.selectedId == selectedId ? "selectedGlyph" : null })
                                 .attr("d", d => xradialLine([
                                     d["scaled_" + "sepal_length"],
                                     d["scaled_" + "sepal_width"],
@@ -255,11 +248,11 @@ function plotGlyphs(glyphsChart, parallelCordChart, selectedId, featurelist, rad
                                     d["scaled_" + "sepal_length"],
                                 ].map((v, i) => [Math.PI * (i) / 2, radialScale(v)])))
                                 .attr("transform", `translate(${xScale(d.x)}, ${yScale(d.y)})`)
-                                .attr("fill", colorClusters(d["variety"]))
                                 .attr("opacity", config.opacityHigh)
                                 .attr("stroke", colorClusters(d["cluster"]))
                                 .attr("stroke-width", config.strokeWidthHigh * 1)
-                                .attr("class", function(d) { return d.selectedId == selectedId ? "selectedGlyph" : null })
+                                .attr("fill", colorClusters(d["variety"]))
+                                
                         });
                     // adding text to show over selected selectedIds
                     if (toggleLabels == true) { addSelectedText() }
@@ -310,15 +303,10 @@ function plotGlyphs(glyphsChart, parallelCordChart, selectedId, featurelist, rad
                         .attr("x", function(d) { return xScale(d.x); })
                         .attr("y", function(d) { return yScale(d.y); })
                         .attr("dx", (-0.8 * config.r / 2) + "px")
-                        .attr("dy", (1.1 * config.r) + "px")
+                        .attr("dy", (config.r) + "px")
                         .attr("font-size", config.labelSize.toString() + "px")
-                        .text(function(d) {
-                            return d.id;
-                            // return d.selectedId.includes() ? d.selectedId : "";
-                            // if (["PROSITC0003", "PROSITC0007", "PROSITC0008", "Test"].some(v => d.selectedId.includes(v))) {
-                            //     return d.selectedId
-                            // } else { return "" }
-                        })
+                        .attr("opacity", 0.8)
+                        .text(function(d) {return d.id;})
                 }
 
                 function addHoverCircle(Id) {
@@ -349,63 +337,71 @@ function plotGlyphs(glyphsChart, parallelCordChart, selectedId, featurelist, rad
                         })
                         .on("click", function(d) {
                             selectedId = d.id
-                                // case1: not pre-selected, not lasso-selected
-                            if (d3.select(this).attr("class") == "hovercircle") {
+                            classCurrentSelection = d3.select(this).attr("class")
+                            // case1: pre-selected lasso-selected
+                            if (classCurrentSelection.includes("hovercircle") & classCurrentSelection.includes("selectedGlyph") & classCurrentSelection.includes("selectedLasso")) {
                                 // console.log("case1")
+                                svgGlyphs.selectAll(".hovercircle")
+                                    .attr("r", config.r / 2)
+
+                                svgGlyphs.selectAll(".hovercircle")
+                                    .transition().duration(config.transition_duration)
+                                    .attr("r", config.r)
+                            }
+                            // case2: not pre-selected, lasso-selected
+                            else if (classCurrentSelection.includes("hovercircle") & classCurrentSelection.includes("selectedLasso")) {
+                                // console.log("case2")
                                 svgGlyphs.selectAll(".selectedGlyph")
                                     .classed("selectedGlyph", false)
                                     .attr("opacity", config.opacityLow)
                                     .attr("stroke-width", config.strokeWidthLow)
                                     .style("fill", config.fillColor);
+
                                 svgGlyphs.selectAll(".selectedLasso")
-                                    .style("fill", config.fillColorHover);
-                                d3.select(this)
-                                    .classed("selectedGlyph", true)
-                                    .attr("opacity", config.opacityHigh)
-                                    .attr("stroke-width", config.strokeWidthHigh)
-                                    .style("fill", config.fillColor);
-                            }
-                            // case2: not pre-selected, lasso-selected
-                            else if (d3.select(this).attr("class") == "hovercircle selectedLasso") {
-                                // console.log("case2")
-                                svgGlyphs.selectAll(".selectedGlyph")
-                                    .classed("selectedGlyph", false)
                                     .attr("opacity", config.opacityClickLow)
                                     .attr("stroke-width", config.strokeWidthLow)
-                                    .style("fill", config.fillColor);
-                                svgGlyphs.selectAll(".selectedLasso")
-                                    .style("fill", config.fillColorHover);
+                                    .style("fill", config.fillColorLasso);
+                                
                                 d3.select(this)
                                     .classed("selectedGlyph", true)
                                     .attr("opacity", config.opacityClickHigh)
                                     .attr("stroke-width", config.strokeWidthHigh)
-                                    .style("fill", config.fillColorHover);
+                                    .style("fill", config.fillColorLasso);
                             }
                             // case3: pre-selected not lasso-selected
-                            else if (d3.select(this).attr("class") == "hovercircle selectedGlyph") {
+                            else if (classCurrentSelection.includes("hovercircle") & classCurrentSelection.includes("selectedGlyph")) {
                                 // console.log("case3")
                                 svgGlyphs.selectAll(".hovercircle")
                                     .attr("r", config.r / 2)
-                                    // .attr("stroke-width", config.strokeWidthHigh / 2)
+
                                 svgGlyphs.selectAll(".hovercircle")
                                     .transition().duration(config.transition_duration)
                                     .attr("r", config.r)
-                                    // .attr("stroke-width", d => { return d.id == selectedId ? config.strokeWidthHigh : config.strokeWidthLow });
+
                                 d3.select(this)
-                                    // .classed("selectedGlyph", true)
                                     .attr("opacity", config.opacityHigh)
                                     .attr("stroke-width", config.strokeWidthHigh)
                                     .style("fill", config.fillColor);
                             }
-                            // case4: pre-selected lasso-selected
-                            else if (d3.select(this).attr("class") == "hovercircle selectedLasso selectedGlyph") {
+                            // case4: not pre-selected, not lasso-selected
+                            else if (classCurrentSelection.includes("hovercircle")) {
                                 // console.log("case4")
-                                svgGlyphs.selectAll(".hovercircle")
-                                    .attr("r", config.r / 2)
-                                    // .attr("stroke-width", config.strokeWidthHigh / 2)
-                                svgGlyphs.selectAll(".hovercircle")
-                                    .transition().duration(config.transition_duration)
-                                    .attr("r", config.r)
+                                svgGlyphs.selectAll(".selectedGlyph")
+                                    .classed("selectedGlyph", false)
+                                    .attr("opacity", config.opacityLow)
+                                    .attr("stroke-width", config.strokeWidthLow)
+                                    .style("fill", config.fillColor);
+
+                                svgGlyphs.selectAll(".selectedLasso")
+                                    .attr("opacity", config.opacityClickLow)
+                                    .attr("stroke-width", config.strokeWidthLow)
+                                    .style("fill", config.fillColorLasso);
+
+                                d3.select(this)
+                                    .classed("selectedGlyph", true)
+                                    .attr("opacity", config.opacityHigh)
+                                    .attr("stroke-width", config.strokeWidthHigh)
+                                    .style("fill", config.fillColor);
                             }
                             plotParallelCord();
                         })
@@ -421,7 +417,7 @@ function plotGlyphs(glyphsChart, parallelCordChart, selectedId, featurelist, rad
                         lasso.selectedItems() // lasso.notSelectedItems()
                             .classed("selectedLasso", true)
                             .style("fill", (d) => {
-                                return (d.id == selectedId) ? "#bdbdbd" : config.fillColorHover
+                                return (d.id == selectedId) ? config.fillColorLasso : config.fillColorLasso
                             })
                             .attr("opacity", (d) => {
                                 return (d.id == selectedId) ? config.opacityClickHigh : config.opacityClickLow

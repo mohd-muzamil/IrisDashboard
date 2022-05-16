@@ -15,7 +15,6 @@ from sklearn.model_selection import train_test_split
 from sklearn.inspection import permutation_importance
 from sklearn.preprocessing import LabelEncoder
 
-from removeOverlap.force_scheme import *
 from removeOverlap.dgrid import *
 
 # Data files
@@ -120,27 +119,27 @@ def dimReduceids():
         k = int(content["k"])
         toggleDimRedux = content["toggleDimRedux"]
         toggleDGrid = content["toggleDGrid"]
-        
-        if len(columns) > 1:  #in case of feature columns are selected in dropdown, consider only those
-            columns = content['featureColumns']
-            message = "status1:fileUpdated"
-            # dim reduction
-            if toggleDimRedux == "TSNE":
-                x, y = getTSNE(featureData, columns, toggleDGrid, width, height, radius)
-            elif toggleDimRedux == "PCA":
-                x, y = getPCA(featureData, columns, toggleDGrid, width, height, radius)
-            
-            cluster = getClusters(featureData, columns, k)    #KNN clustering
-            for column in [ feature for feature in featureData.columns if feature not in ["id", "variety"]]:
-                featureData["scaled_"+column] = np.round(featureData[column] / featureData[column].abs().max(), 3)
-
-            featureData["x"], featureData["y"] = x, y
-            featureData["cluster"] = cluster
-            
-            featureData.to_csv(os.path.join(
-                "data/processedData", featureFile), index=False, header=True)
-        else:
+        if len(columns)<2:  #in case of feature columns are selected in dropdown, consider only those
+            columns = [col for col in list(featureData.columns) if col not in ["id", "variety"]]
             message = "status2:singleColumn"
+        else:
+            message = "status1:fileUpdated"
+
+        # dim reduction
+        if toggleDimRedux == "TSNE":
+            x, y = getTSNE(featureData, columns, toggleDGrid, width, height, radius)
+        elif toggleDimRedux == "PCA":
+            x, y = getPCA(featureData, columns, toggleDGrid, width, height, radius)
+        
+        cluster = getClusters(featureData, columns, k)    #KNN clustering
+        for column in [ feature for feature in featureData.columns if feature not in ["id", "variety"]]:
+            featureData["scaled_"+column] = np.round(featureData[column] / featureData[column].abs().max(), 3)
+
+        featureData["x"], featureData["y"] = x, y
+        featureData["cluster"] = cluster
+        
+        featureData.to_csv(os.path.join(
+            "data/processedData", featureFile), index=False, header=True)
     return jsonify(message)
 
 
@@ -201,7 +200,10 @@ def featureImportance():
     if request.method == 'POST':
         content = request.get_json()
         columns = content["featureColumns"]
+
         featureData = pd.read_csv(os.path.join("data/rawData", featureFile))
+        if len(columns)<=1:
+            columns = [col for col in list(featureData.columns) if col not in ["id", "variety"]]
         featuresWithImportance = getFeatureImportance(featureData, columns)
         return jsonify(featuresWithImportance)
 
