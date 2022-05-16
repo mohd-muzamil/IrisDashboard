@@ -1,0 +1,427 @@
+[33mcommit 6d4c68642900d83fd3719006a04c28023dbd90ae[m
+Author: mohd-muzamil <mohd.muzamil.08@gmail.com>
+Date:   Sun Jan 30 07:52:02 2022 +0000
+
+    Jan 30
+
+[1mdiff --git a/js/radialTimeChart.js b/js/radialTimeChart.js[m
+[1mindex 78c2ba8..045700b 100644[m
+[1m--- a/js/radialTimeChart.js[m
+[1m+++ b/js/radialTimeChart.js[m
+[36m@@ -2,7 +2,7 @@[m [mfunction plotAreaChart(chart, participantId, attributes) {[m
+     var chart = chart[m
+     var participantId = participantId[m
+     var attributes = attributes[m
+[31m-    var pathColor = {"brt": "#1b9e77", "acc": "#d95f02", "gyr": "#7570b3"}[m
+[32m+[m[32m    var pathColor = {"brt": "#1b9e77", "acc": "#d95f02", "gyr": "#7570b3"}   //dark green/Orange/Purple: colorblind safe[m
+     var gridPlotted = false[m
+ [m
+     var postForm = { //Fetch form data[m
+[36m@@ -57,7 +57,9 @@[m [mfunction plotAreaChart(chart, participantId, attributes) {[m
+                     var parseDate = d3.timeFormat("%Y-%m-%d");[m
+                 [m
+                     // var arcGenerator = d3.arc();[m
+[31m-                [m
+[32m+[m[41m                    [m
+[32m+[m[32m                    d3.select("#" + chart).selectAll('g').remove();     //clearing the chart before plotting new data[m
+[32m+[m[41m                    [m
+                     // Select the svg[m
+                     var svg = d3.select("#" + chart)[m
+                         .attr("width", width)[m
+[36m@@ -123,18 +125,20 @@[m [mfunction plotAreaChart(chart, participantId, attributes) {[m
+                     if (gridPlotted === false) {[m
+                         // Creating a grid for reference[m
+                         radius = Math.min(width, height) / 2 + 15;[m
+[31m-                [m
+[32m+[m[41m                        [m
+                         // var grad = svg.append("defs")[m
+                         //     .append("linearGradient").attr("id", "grad")[m
+                         //     .attr("x1", "0%").attr("x2", "0%").attr("y1", "100%").attr("y2", "0%");[m
+                 [m
+                         // grad.append("stop").attr("offset", "50%").style("stop-color", "lightblue");[m
+                         // grad.append("stop").attr("offset", "50%").style("stop-color", "white");[m
+[31m-                [m
+[32m+[m[41m                        [m
+                         svg.append("text")[m
+[31m-                        .attr("x", -width/5)[m
+[32m+[m[32m                        .attr("x", 0)[m
+                         .attr("y", -margin.top - height/2)[m
+                         .attr("dy", "-0.1em")[m
+[32m+[m[32m                        .style("text-anchor", "middle")[m
+[32m+[m[32m                        .style("font-size", "20px")[m
+                         .text("Participant: "+participantId)[m
+                 [m
+                         svg.selectAll(".gridCircles")[m
+[36m@@ -338,7 +342,6 @@[m [mfunction plotAreaChart(chart, participantId, attributes) {[m
+                 return [range[0], range[1]][m
+             }[m
+             })[m
+[31m-    return true, true;[m
+ }[m
+ [m
+ [m
+
+[33mcommit 6550c93a5d667f843121f3fa68ab040ffd04e27c[m
+Author: mohd-muzamil <mohd.muzamil.08@gmail.com>
+Date:   Fri Jan 28 07:24:06 2022 +0000
+
+    Jan 28 0323am
+
+[1mdiff --git a/js/radialTimeChart.js b/js/radialTimeChart.js[m
+[1mnew file mode 100644[m
+[1mindex 0000000..78c2ba8[m
+[1m--- /dev/null[m
+[1m+++ b/js/radialTimeChart.js[m
+[36m@@ -0,0 +1,351 @@[m
+[32m+[m[32mfunction plotAreaChart(chart, participantId, attributes) {[m
+[32m+[m[32m    var chart = chart[m
+[32m+[m[32m    var participantId = participantId[m
+[32m+[m[32m    var attributes = attributes[m
+[32m+[m[32m    var pathColor = {"brt": "#1b9e77", "acc": "#d95f02", "gyr": "#7570b3"}[m
+[32m+[m[32m    var gridPlotted = false[m
+[32m+[m
+[32m+[m[32m    var postForm = { //Fetch form data[m
+[32m+[m[32m        // 'filename': filename, //Store name fields value[m
+[32m+[m[32m        'participantId': participantId, //Store name fields value[m
+[32m+[m[32m        "attributes" : attributes[m
+[32m+[m[32m    };[m
+[32m+[m
+[32m+[m[32m    //fetcing filtered participant data from flask server[m
+[32m+[m[32m    d3.csv("/filterParticipants")[m
+[32m+[m[32m        .header("Content-Type", "application/json")[m
+[32m+[m[32m        .post(JSON.stringify(postForm),[m
+[32m+[m[32m            function(data) {[m
+[32m+[m[32m                data.forEach(function(d) {[m
+[32m+[m[32m                    // d.date = parseDate(d.date);[m
+[32m+[m[32m                    d.minuteOfTheDay = +d.minuteOfTheDay;[m
+[32m+[m[32m                    d.brt = +d.brt;[m
+[32m+[m[32m                    d.acc = +d.acc;[m
+[32m+[m[32m                    d.gyr = +d.gyr;[m
+[32m+[m[32m                });[m
+[32m+[m
+[32m+[m[32m                dates = Array.from(new Set(data.map(x => x.date)).values()).sort();[m
+[32m+[m[32m                d2i = {};[m
+[32m+[m[32m                dates.forEach((d, i) => d2i[d] = i+1);[m
+[32m+[m[32m                numDates = Object.keys(dates).length[m
+[32m+[m
+[32m+[m[32m                var sliderMin = 1[m
+[32m+[m[32m                var sliderMax = numDates[m
+[32m+[m[32m                var starting_min = 1[m
+[32m+[m[32m                var starting_max = numDates[m
+[32m+[m
+[32m+[m[32m                plotRadial(starting_min, starting_max)[m
+[32m+[m[32m                if (true){[m
+[32m+[m[32m                    brushSlider(min = sliderMin, max = sliderMax, starting_min, starting_max+1);[m
+[32m+[m[32m                }[m
+[32m+[m[41m                [m
+[32m+[m[32m                // plotRadier function here[m
+[32m+[m[32m                function plotRadial(starting_min, starting_max){[m
+[32m+[m[32m                    const config = {[m
+[32m+[m[32m                        opacity: 0.8,[m
+[32m+[m[32m                        strokewidth: 1[m
+[32m+[m[32m                    }[m
+[32m+[m[41m                [m
+[32m+[m[32m                    var radians = 0.0174532925,[m
+[32m+[m[32m                        hourLabelYOffset = 7;[m
+[32m+[m[41m                [m
+[32m+[m[32m                    // Set the dimensions of the canvas / graph[m
+[32m+[m[32m                    var margin = { top: 25, right: 30, bottom: 75, left: 30 },[m
+[32m+[m[32m                        width = Math.floor(+$("#" + chart).width()) - margin.left - margin.right,[m
+[32m+[m[32m                        height = Math.floor(+$("#" + chart).height()) - margin.top - margin.bottom;[m
+[32m+[m[32m                    // Parse the date / time[m
+[32m+[m[32m                    var parseDate = d3.timeFormat("%Y-%m-%d");[m
+[32m+[m[41m                [m
+[32m+[m[32m                    // var arcGenerator = d3.arc();[m
+[32m+[m[41m                [m
+[32m+[m[32m                    // Select the svg[m
+[32m+[m[32m                    var svg = d3.select("#" + chart)[m
+[32m+[m[32m                        .attr("width", width)[m
+[32m+[m[32m                        .attr("height", height)[m
+[32m+[m[32m                        .append('g')[m
+[32m+[m[32m                        .attr("transform", `translate(${(margin.left + width + margin.right) / 2}, ${(margin.top/2 + height + margin.bottom) / 2})`);[m
+[32m+[m[41m                [m
+[32m+[m[32m                    var find_radius = d3.scaleLinear()[m
+[32m+[m[32m                        // .domain(d3.extent(data, function(d) { return + (new Date(...d.date.split("-").map((x)=>(+x)))); }))[m
+[32m+[m[32m                        .domain([starting_min-1, starting_max])[m
+[32m+[m[32m                        .range([Math.min(height, width) / 8, Math.min(height, width) / 2]);[m
+[32m+[m[41m                [m
+[32m+[m[32m                    var hourScale = d3.scaleLinear()[m
+[32m+[m[32m                        .domain([0, 24])[m
+[32m+[m[32m                        .range([0, 360]);[m
+[32m+[m[41m                [m
+[32m+[m[32m                    x = d3.scaleLinear()[m
+[32m+[m[32m                        .domain([0, 1440])[m
+[32m+[m[32m                        .range([0, 2 * Math.PI]);[m
+[32m+[m[41m                    [m
+[32m+[m[32m                    for (let i=0; i<Object.keys(attributes).length; i++){[m
+[32m+[m[32m                        attr = Object.keys(attributes)[i][m
+[32m+[m[32m                        if (attributes[attr]){[m
+[32m+[m[32m                            // d3.range(starting_min, starting_max)((d, i) =>[m
+[32m+[m[32m                            for (let d=starting_min; d<=starting_max; d++){[m
+[32m+[m[32m                                currDate = d;[m
+[32m+[m[41m                        [m
+[32m+[m[32m                                datum = data.filter(function(row, i) {[m
+[32m+[m[32m                                    return d2i[row['date']] == currDate && row[attr] != NaN;[m
+[32m+[m[32m                                })[m
+[32m+[m[41m                        [m
+[32m+[m[32m                                y = d3.scaleLinear()[m
+[32m+[m[32m                                    .domain(d3.extent(datum, function(d) { return d[attr]; }))[m
+[32m+[m[32m                                    .range([find_radius(currDate-1), find_radius(currDate)]);[m
+[32m+[m[41m                        [m
+[32m+[m[32m                                const area = d3.areaRadial()[m
+[32m+[m[32m                                    .angle(d => x(d.minuteOfTheDay))[m
+[32m+[m[32m                                    .innerRadius(d => y(0))[m
+[32m+[m[32m                                    .outerRadius(d => y(d[attr]));[m
+[32m+[m[41m                                [m
+[32m+[m[32m                                var xScale = d3.scaleLinear()[m
+[32m+[m[32m                                    .domain([0, 6])[m
+[32m+[m[32m                                    .range([0, 2 * Math.PI]);[m
+[32m+[m
+[32m+[m[32m                                var yScale = d3.scaleLinear()[m
+[32m+[m[32m                                    .domain([0, 20])[m
+[32m+[m[32m                                    .range([width/2, height/2]);[m
+[32m+[m[41m                        [m
+[32m+[m[32m                                // Add the line[m
+[32m+[m[32m                                svg.append("path")[m
+[32m+[m[32m                                .attr("class", "areaPath")[m
+[32m+[m[32m                                .attr("fill", pathColor[attr])[m
+[32m+[m[32m                                .attr('opacity', 1)[m
+[32m+[m[32m                                .attr("stroke", "black")[m
+[32m+[m[32m                                .attr("stroke-width", 1 / 20)[m
+[32m+[m[32m                                .attr("d", area(datum))[m
+[32m+[m[41m                        [m
+[32m+[m[32m                                d3.select("#" + chart).selectAll('.buffer').remove();[m
+[32m+[m[32m                            }[m
+[32m+[m[32m                        }[m
+[32m+[m[32m                    }[m
+[32m+[m[41m                [m
+[32m+[m[32m                    if (gridPlotted === false) {[m
+[32m+[m[32m                        // Creating a grid for reference[m
+[32m+[m[32m                        radius = Math.min(width, height) / 2 + 15;[m
+[32m+[m[41m                [m
+[32m+[m[32m                        // var grad = svg.append("defs")[m
+[32m+[m[32m                        //     .append("linearGradient").attr("id", "grad")[m
+[32m+[m[32m                        //     .attr("x1", "0%").attr("x2", "0%").attr("y1", "100%").attr("y2", "0%");[m
+[32m+[m[41m                [m
+[32m+[m[32m                        // grad.append("stop").attr("offset", "50%").style("stop-color", "lightblue");[m
+[32m+[m[32m                        // grad.append("stop").attr("offset", "50%").style("stop-color", "white");[m
+[32m+[m[41m                [m
+[32m+[m[32m                        svg.append("text")[m
+[32m+[m[32m                        .attr("x", -width/5)[m
+[32m+[m[32m                        .attr("y", -margin.top - height/2)[m
+[32m+[m[32m                        .attr("dy", "-0.1em")[m
+[32m+[m[32m                        .text("Participant: "+participantId)[m
+[32m+[m[41m                [m
+[32m+[m[32m                        svg.selectAll(".gridCircles")[m
+[32m+[m[32m                            .data(d3.range(starting_min-1, starting_max+1, 1))[m
+[32m+[m[32m                            .enter()[m
+[32m+[m[32m                            .append("circle")[m
+[32m+[m[32m                            .attr("class", "gridCircles")[m
+[32m+[m[32m                            .attr("fill", "none")[m
+[32m+[m[32m                            // .style("fill", "url(#grad)")[m
+[32m+[m[32m                            .attr("stroke", "black")[m
+[32m+[m[32m                            .attr("opacity", config.opacity)[m
+[32m+[m[32m                            .attr("stroke-width", 1 / 10)[m
+[32m+[m[32m                            .attr("r", function(d) {[m
+[32m+[m[32m                                return find_radius(d)[m
+[32m+[m[32m                            })[m
+[32m+[m[41m                [m
+[32m+[m[32m                        svg.selectAll(".gridLines")[m
+[32m+[m[32m                            .data(d3.range(0, 24, 1))[m
+[32m+[m[32m                            .enter()[m
+[32m+[m[32m                            .append("line")[m
+[32m+[m[32m                            .attr("class", 'gridLines')[m
+[32m+[m[32m                            .attr("x1", find_radius(starting_min-1))[m
+[32m+[m[32m                            .attr("x2", find_radius(starting_max))[m
+[32m+[m[32m                            .attr("opacity", config.opacity)[m
+[32m+[m[32m                            .attr("stroke", "black")[m
+[32m+[m[32m                            .attr("stroke-width", 1 / 10)[m
+[32m+[m[32m                            .attr("transform", function(d) { return `rotate(${hourScale(d)})` });[m
+[32m+[m[41m                [m
+[32m+[m[32m                        svg.selectAll('.hourLabel')[m
+[32m+[m[32m                            .data(d3.range(0, 24, 1))[m
+[32m+[m[32m                            .enter()[m
+[32m+[m[32m                            .append('text')[m
+[32m+[m[32m                            .attr('class', 'hourLabel')[m
+[32m+[m[32m                            .attr('text-anchor', 'middle')[m
+[32m+[m[32m                            .style('font-size', '0.8em')[m
+[32m+[m[32m                            .attr('x', function(d) {[m
+[32m+[m[32m                                return radius * Math.sin(hourScale(d) * radians);[m
+[32m+[m[32m                            })[m
+[32m+[m[32m                            .attr('y', function(d) {[m
+[32m+[m[32m                                return -radius * Math.cos(hourScale(d) * radians) + 7;[m
+[32m+[m[32m                            })[m
+[32m+[m[32m                            .text(function(d) {[m
+[32m+[m[32m                                return d + "hr";[m
+[32m+[m[32m                            });[m
+[32m+[m[41m                [m
+[32m+[m[41m                [m
+[32m+[m[32m                        svg.selectAll('.dayLabel')[m
+[32m+[m[32m                            .data(d3.range(starting_min, starting_max+1, 1))[m
+[32m+[m[32m                            .enter()[m
+[32m+[m[32m                            .append('text')[m
+[32m+[m[32m                            .attr('class', 'dayLabel')[m
+[32m+[m[32m                            .attr('text-anchor', 'middle')[m
+[32m+[m[32m                            .style('font-size', '0.5em')[m
+[32m+[m[32m                            .attr('x', 0)[m
+[32m+[m[32m                            .attr('y', function(d) {return find_radius(d)})[m
+[32m+[m[32m                            .text(function(d) {[m
+[32m+[m[32m                                return d;[m
+[32m+[m[32m                            })[m
+[32m+[m[32m                            .on('mouseover', function(d) {[m
+[32m+[m[32m                                d3.select(this)[m
+[32m+[m[32m                                    // .attr('y', "-3em")[m
+[32m+[m[32m                                    .style('font-size', '2em')[m
+[32m+[m[32m                                    .style("cursor", "default")[m
+[32m+[m[32m                            })[m
+[32m+[m[32m                            .on('mouseout', function(d) {[m
+[32m+[m[32m                                d3.select(this)[m
+[32m+[m[32m                                    // .attr('y', "1em")[m
+[32m+[m[32m                                    .style('font-size', '0.5em')[m
+[32m+[m[32m                                    .style("fill", "black");[m
+[32m+[m[32m                            });[m
+[32m+[m[32m                    }[m[41m       [m
+[32m+[m[32m                        //remove the loading symbol[m
+[32m+[m[32m                        d3.select("#" + chart).selectAll('.buffer').remove();[m[41m        [m
+[32m+[m[32m                }[m
+[32m+[m
+[32m+[m[32m                // Code for brush[m
+[32m+[m[32m            function brushSlider(min, max, starting_min = min, starting_max = max) {[m
+[32m+[m
+[32m+[m[32m                var range = [min, max+1][m
+[32m+[m[32m                var starting_range = [starting_min, starting_max][m
+[32m+[m[41m            [m
+[32m+[m[32m                // set width and height of svg[m
+[32m+[m[32m                var margin = { top: 25, right: 25, bottom: 25, left: 25 },[m
+[32m+[m[32m                    width = Math.floor(+$("#" + chart).width()) - margin.left - margin.right,[m
+[32m+[m[32m                    height = Math.floor(+$("#" + chart).height()) - margin.top - margin.bottom;[m
+[32m+[m[41m            [m
+[32m+[m[32m                // create x scale[m
+[32m+[m[32m                var x = d3.scaleLinear()[m
+[32m+[m[32m                    .domain(range) // data space[m
+[32m+[m[32m                    .range([0, width]); // display space[m
+[32m+[m[41m            [m
+[32m+[m[32m                // create svg and translated g[m
+[32m+[m[32m                var svg = d3.select('#' + chart)[m
+[32m+[m[32m                var g = svg.append('g').attr("class", "brush").attr('transform', `translate(${margin.left}, ${height + 1.25*(margin.bottom)})`)[m
+[32m+[m[41m            [m
+[32m+[m[32m                // draw background lines[m
+[32m+[m[32m                g.append('g').selectAll('line')[m
+[32m+[m[32m                    .data(d3.range(range[0], range[1] + 1))[m
+[32m+[m[32m                    .enter()[m
+[32m+[m[32m                    .append('line')[m
+[32m+[m[32m                    .attr('x1', d => x(d)).attr('x2', d => x(d))[m
+[32m+[m[32m                    .attr('y1', 0).attr('y2', margin.bottom / 1.5)[m
+[32m+[m[32m                    .style('stroke', '#ccc')[m
+[32m+[m[41m            [m
+[32m+[m[32m                // labels[m
+[32m+[m[32m                var labelL = g.append('text')[m
+[32m+[m[32m                    .attr('id', 'labelleft')[m
+[32m+[m[32m                    .attr('x', -10)[m
+[32m+[m[32m                    .attr('y', -5)[m
+[32m+[m[32m                    .text(range[0])[m
+[32m+[m[41m            [m
+[32m+[m[32m                var labelR = g.append('text')[m
+[32m+[m[32m                    .attr('id', 'labelright')[m
+[32m+[m[32m                    .attr('x', -10)[m
+[32m+[m[32m                    .attr('y', -5)[m
+[32m+[m[32m                    .text(range[1])[m
+[32m+[m[41m            [m
+[32m+[m[32m                // define brush[m
+[32m+[m[32m                var brush = d3.brushX()[m
+[32m+[m[32m                    .extent([[m
+[32m+[m[32m                        [0, 0],[m
+[32m+[m[32m                        [width, margin.bottom / 1.5][m
+[32m+[m[32m                    ])[m
+[32m+[m[32m                    .on('brush', function() {[m
+[32m+[m[32m                        var s = d3.event.selection;[m
+[32m+[m[32m                        // update and move labels[m
+[32m+[m[32m                        labelL.attr('x', s[0]-15)[m
+[32m+[m[32m                            .text(Math.round(x.invert(s[0])))[m
+[32m+[m[32m                        labelR.attr('x', s[1])[m
+[32m+[m[32m                            .text(Math.round(x.invert(s[1])) - 1)[m
+[32m+[m[32m                            // move brush handles[m[41m      [m
+[32m+[m[32m                        handle.attr("display", null).attr("transform", function(d, i) { return "translate(" + [s[i], -margin.bottom / 2] + ")"; });[m
+[32m+[m[32m                        // update view[m
+[32m+[m[32m                        // if the view should only be updated after brushing is over,[m[41m [m
+[32m+[m[32m                        // move these two lines into the on('end') part below[m
+[32m+[m[32m                        svg.node().value = s.map(d => Math.round(x.invert(d)));[m
+[32m+[m[32m                        svg.node().dispatchEvent(new CustomEvent("input"));[m
+[32m+[m[32m                    })[m
+[32m+[m[32m                    .on('end', function() {[m
+[32m+[m[32m                        if (!d3.event.sourceEvent) return;[m
+[32m+[m
+[32m+[m[32m                        var d0 = d3.event.selection.map(x.invert);[m
+[32m+[m[32m                        var d1 = d0.map(Math.round)[m
+[32m+[m[32m                        if (d1[0]<d1[1]){[m
+[32m+[m[32m                            d3.select(this).transition().call(d3.event.target.move, d1.map(x))[m
+[32m+[m[41m                            [m
+[32m+[m[32m                            d3.select("#" + chart).selectAll('.areaPath').remove();[m
+[32m+[m[32m                            d3.select("#" + chart).selectAll('.gridCircles').remove();[m
+[32m+[m[32m                            d3.select("#" + chart).selectAll('.gridLines').remove();[m
+[32m+[m[32m                            d3.select("#" + chart).selectAll('.hourLabel').remove();[m
+[32m+[m[32m                            d3.select("#" + chart).selectAll('.dayLabel').remove();[m
+[32m+[m[41m                            [m
+[32m+[m[32m                            plotRadial(d1[0], d1[1]-1)[m
+[32m+[m[32m                        }[m
+[32m+[m
+[32m+[m[32m                    })[m
+[32m+[m[41m            [m
+[32m+[m[32m                // append brush to g[m
+[32m+[m[32m                var gBrush = g.append("g")[m
+[32m+[m[32m                    .attr("class", "brush")[m
+[32m+[m[32m                    .call(brush)[m
+[32m+[m[41m            [m
+[32m+[m[32m                // add brush handles (from https://bl.ocks.org/Fil/2d43867ba1f36a05459c7113c7f6f98a)[m
+[32m+[m[32m                var brushResizePath = function(d) {[m
+[32m+[m[32m                    var e = +(d.type == "e"),[m
+[32m+[m[32m                        x = e ? 1 : -1,[m
+[32m+[m[32m                        y = margin.bottom / 1.75;[m
+[32m+[m[32m                    return "M" + (.5 * x) + "," + y + "A6,6 0 0 " + e + " " + (6.5 * x) + "," + (y + 6) + "V" + (2 * y - 6) +[m
+[32m+[m[32m                        "A6,6 0 0 " + e + " " + (.5 * x) + "," + (2 * y) + "Z" + "M" + (2.5 * x) + "," + (y + 8) + "V" + (2 * y - 8) +[m
+[32m+[m[32m                        "M" + (4.5 * x) + "," + (y + 8) + "V" + (2 * y - 8);[m
+[32m+[m[32m                }[m
+[32m+[m[41m            [m
+[32m+[m[32m                var handle = gBrush.selectAll(".handle--custom")[m
+[32m+[m[32m                    .data([{ type: "w" }, { type: "e" }])[m
+[32m+[m[32m                    .enter().append("path")[m
+[32m+[m[32m                    .attr("class", "handle--custom")[m
+[32m+[m[32m                    .attr("stroke", "#000")[m
+[32m+[m[32m                    .attr("fill", '#eee')[m
+[32m+[m[32m                    .attr("cursor", "ew-resize")[m
+[32m+[m[32m                    .attr("d", brushResizePath);[m
+[32m+[m[41m            [m
+[32m+[m[32m                // override default behaviour - clicking outside of the selected area[m[41m [m
+[32m+[m[32m                // will select a small piece there rather than deselecting everything[m
+[32m+[m[32m                // https://bl.ocks.org/mbostock/6498000[m
+[32m+[m[32m                gBrush.selectAll(".overlay")[m
+[32m+[m[32m                    .each(function(d) { d.type = "selection"; })[m
+[32m+[m[32m                    .on("mousedown touchstart", brushcentered)[m
+[32m+[m[41m            [m
+[32m+[m[32m                function brushcentered() {[m
+[32m+[m[32m                    var dx = x(7) - x(0), // Use a fixed width when recentering.[m
+[32m+[m[32m                        cx = d3.mouse(this)[0],[m
+[32m+[m[32m                        x0 = cx - dx / 2,[m
+[32m+[m[32m                        x1 = cx + dx / 2;[m
+[32m+[m[32m                    d3.select(this.parentNode).call(brush.move, x1 > width ? [width - dx, width] : x0 < 0 ? [0, dx] : [x0, x1]);[m
+[32m+[m[32m                }[m
+[32m+[m[41m            [m
+[32m+[m[32m                // select entire starting range[m
+[32m+[m[32m                gBrush.call(brush.move, starting_range.map(x))[m
+[32m+[m[41m            [m
+[32m+[m[32m                // return svg.node()[m
+[32m+[m[32m                return [range[0], range[1]][m
+[32m+[m[32m            }[m
+[32m+[m[32m            })[m
+[32m+[m[32m    return true, true;[m
+[32m+[m[32m}[m
+[32m+[m
+[32m+[m
+[32m+[m[32mfunction updatePlotAreaChart(chart, participantId, brtChecked, accChecked, gyrChecked, lckChecked) {[m
+[32m+[m[32m    /* This method is used to call the plotting method for different sensor attributes*/[m
+[32m+[m[32m    d3.select("#" + chart).selectAll('g').remove();     //clearing the chart before plotting new data[m
+[32m+[m[32m    buffering(chart, participantId);       //calling method that plots buffering symbol[m
+[32m+[m[32m    attributes = {"brt":brtChecked, "acc":accChecked, "gyr":gyrChecked}[m
+[32m+[m[32m    plotAreaChart(chart, participantId, attributes)[m
+[32m+[m[32m}[m
+\ No newline at end of file[m

@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Iris-UseCase</title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Bootstrap CSS CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+    <link href="https://code.jquery.com/ui/1.12.1/themes/ui-lightness/jquery-ui.css" rel="stylesheet" />
+    <link href="../css/style.css" rel="stylesheet">
+    <link href="../css/parallelCordMBostock.css" rel="stylesheet">
+    <!-- <link href="../css/dropdown.css" rel="stylesheet"> -->
+</head>
+
+<body>
+    <!-- latest version of bootstrap -->
+    <!-- <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script> -->
+    <!-- <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script> -->
+
+    <!-- older version of bootstrap with working multiselect dropdown -->
+    <!-- <script src="https://unpkg.com/ag-grid-community/dist/ag-grid-community.min.js"></script> -->
+    <!-- <script src="https://unpkg.com/ag-grid-enterprise@27.0.1/dist/ag-grid-enterprise.min.js"> -->
+    </script>
+    <!-- load bootstrap -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/css/bootstrap.min.css" integrity="sha384-zCbKRCUGaJDkqS1kPbPd7TveP5iyJE0EjAuZQTgFLD2ylzuqKfdKlfG/eSrtxUkn" crossorigin="anonymous">
+    <!-- load jQuery -->
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
+    <!-- load jQuery UI -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js" integrity="sha512-uto9mlQzrs59VwILcLiRYeLKPPbS/bT71da/OEBYEwcdNUk8jYIy+D176RYoop1Da+f9mvkYrmj5MCLZWEtQuA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <!-- load libraries for multiselect dropdown -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-fQybjgWLrvvRgtW6bFlB7jaZrFsaBXjsOMm/tB9LTS58ONXgqbR9W8oWht/amnpF" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-multiselect/1.1.1/js/bootstrap-multiselect.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-multiselect/1.1.1/css/bootstrap-multiselect.css">
+
+    <div class="container-fluid p-10" style="height:100%">
+        <div class="row flex-nowrap" style="height:100%">
+
+            <!-- sidebar -->
+            <div class="col-auto px-0">
+                <div id="sidebar" class="collapse collapse-horizontal show">
+                    <!-- show is used here to hide or show the sidebar by default-->
+                    <!-- <div id="sidebar" class="collapse collapse-horizontal show border-end"> -->
+                    <div id="sidebar-nav" class="list-group border-0 rounded-0 text-sm-start min-vh-100">
+                        <img src="../img/iris.png" alt="Iris" style="display: block; margin-top:20px; margin-left:auto; margin-right: auto; width: 30%;">
+                        <h6 id="dashboardHeader" style="margin:0; padding: 0; text-align:center; color:rgb(18, 113, 249)">Iris Dataset</h6>
+                        <hr class="line">
+
+                        <!-- multi select dropdown -->
+                        <div style="padding-left:10px; padding-bottom:10px; text-align: center;">
+                            <label>Feature selection</label>
+                            <select id="featureSelect" multiple>
+                                <optgroup label="Attributes">
+                                    <option value="sepal_length" selected="selected">Sepal Length</option>
+                                    <option value="sepal_width" selected="selected">Sepal Width</option>
+                                    <option value="petal_length" selected="selected">Petal Length</option>
+                                    <option value="petal_width" selected="selected">Petal Width</option>
+                                </optgroup>
+                        </select>
+                        </div>
+                        <hr class="line">
+
+                        <!-- slider for radius of glyph -->
+                        <div class="slidecontainer" style="text-align: center; padding-left:10px; padding-bottom:0px; margin-bottom:0px;">
+                            <label style="font-size: 12px;">Glyph Radius: </label>
+                            <span style="font-size: 12px;" id="sliderVal"></span>
+                            <br>
+                            <div>
+                                <input type="range" min="10" max="20" value="15" steps='1' class="slider" id="myRange">
+                            </div>
+                        </div>
+                        <hr class="line">
+
+                        <!-- k-param -->
+                        <div class="num-block skin-1 scaled">
+                            <div style="text-align: center;">
+                                <label style="font-size: 15px; font-weight:500; ">k param for knn</label>
+                            </div>
+                            <div class="num-in">
+                                <span class="minus"></span>
+                                <input type="text" class="in-num" value="3">
+                                <span class="plus"></span>
+                            </div>
+                        </div>
+                        <hr class="line">
+
+                        <!-- Toggle glyph switch -->
+                        <div style="text-align: center;" class="scaled">
+                            <label class="form-check-label selectedLabel" id="radialSwitch" for="toggleGlyph" style="text-align: center; font-size: 15px;">Radial Glyph</label>
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" role="switch" id="toggleGlyph" unchecked/>
+                            </div>
+                            <label class="form-check-label" id="flowerSwitch" for="toggleGlyph" style="text-align: center; font-size: 15px;">Flower Glyph</label>
+                        </div>
+                        <hr class="line">
+
+                        <!-- Toggle Dimensionality Reduction technique TSNE/PCA -->
+                        <div style="text-align: center;" class="scaled">
+                            <label class="form-check-label selectedLabel" id="tsneSwitch" for="toggleDimRedux" style="text-align: center; font-size: 15px;">TSNE</label>
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" role="switch" id="toggleDimRedux" unchecked/>
+                            </div>
+                            <label class="form-check-label" id="pcaSwitch" for="toggleDimRedux" style="text-align: center; font-size: 15px;">PCA</label>
+                        </div>
+                        <hr class="line">
+
+                        <!-- Toggle Overlap removal -->
+                        <div style="text-align: center;" class="scaled">
+                            <label class="form-check-label selectedLabel" id="useDGrid" for="toggleDGrid" style="text-align: center; font-size: 15px;">Remove Overlap</label>
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" role="switch" id="toggleDGrid" unchecked/>
+                            </div>
+                            <label class="form-check-label" id="noUseDGrid" for="toggleDGrid" style="text-align: center; font-size: 15px;">Keep Overlap</label>
+                        </div>
+                        <hr class="line">
+
+                        <!-- Show labels switch -->
+                        <div style="text-align: center;" class="scaled">
+                            <label class="form-check-label selectedLabel" id="hideLabels" for="toggleLabels" style="text-align: center; font-size: 15px;">Hide Labels</label>
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" role="switch" id="toggleLabels" unchecked/>
+                            </div>
+                            <label class="form-check-label" id="showLables" for="toggleLabels" style="text-align: center; font-size: 15px;">Show Lables</label>
+                        </div>
+                        <hr class="line">
+
+                        <!-- Show grid switch -->
+                        <div style="text-align: center;" class="scaled">
+                            <label class="form-check-label selectedLabel" id="showSvgGrid" for="toggleSvgGrid" style="text-align: center; font-size: 15px;">Show Grid</label>
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" role="switch" id="toggleSvgGrid" unchecked/>
+                            </div>
+                            <label class="form-check-label" id="hideSvgGrid" for="toggleSvgGrid" style="text-align: center; font-size: 15px;">Hide Grid</label>
+                        </div>
+                        <hr class="line">
+
+                        <!-- submit button -->
+                        <div style="display:flex; justify-content: center; align-items: center;" class="scaled">
+                            <button type="button" class="btn btn-outline-primary btn-sm" id="Submit">Submit</button>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            <!-- main -->
+            <main class="col ps-md-2 pb-10">
+                <!-- Dashboard title -->
+                <!-- <h5 id="dashboardHeader" style="color:rgb(18, 113, 249); text-align: center;">Usecase</h5> -->
+
+                <div class="ma-5" id="dashboard">
+                    <div id="gui"></div>
+                    <svg class="svg1" id="chart1"></svg>
+                    <svg class="svg2" id="chart2"></svg>
+                </div>
+
+                <a data-toggle="collapse" href="#" data-target="#sidebar" aria-expanded="false" id="menu">Menu</a>
+            </main>
+        </div>
+    </div>
+
+    <script>
+        //settings for multiselect dropdown - run at the begining of page refresh/first load
+        $('#featureSelect').multiselect({
+            enableClickableOptGroups: true,
+            enableCollapsibleOptGroups: true,
+            enableFiltering: true,
+            filterPlaceholder: 'Search',
+            includeSelectAllOption: true,
+            buttonWidth: '140px',
+            maxHeight: screen.height * 0.6,
+            // buttonClass: 'btn btn-link',
+            numberDisplayed: 1
+        })
+
+        // Calling server route to find dim reduce for all columns - run at the begining of page refresh/first load
+        featurelist = $('#featureSelect').val()
+        w = Math.floor($('.svg1')[0].getBoundingClientRect().width);
+        h = Math.floor($('.svg1')[0].getBoundingClientRect().height)
+        radius = +document.getElementById("myRange").value
+        toggleDimRedux = "TSNE"
+        toggleDGrid = true
+        k = $('.num-in span').parents('.num-block').find('input.in-num').val()
+        var postForm = {
+            "featureColumns": featurelist,
+            "width": w,
+            "height": h,
+            "radius": radius,
+            "k": k,
+            "toggleDimRedux": toggleDimRedux,
+            "toggleDGrid": toggleDGrid
+        }
+        $.ajax({
+            type: "POST",
+            contentType: 'application/json',
+            data: JSON.stringify(postForm),
+            url: "/dimReduceIds"
+        })
+
+        // list of all the distinct ids in feature file
+    </script>
+
+    <!-- Imports -->
+    <script src="https://d3js.org/d3.v4.min.js"></script>
+    <script src="https:/d3js.org/d3-scale-chromatic.v0.3.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3-legend/2.25.6/d3-legend.min.js"></script>
+    <!-- <script src="//cdnjs.cloudflare.com/ajax/libs/d3-legend/1.1.0/d3-legend.js"></script> -->
+    <!-- <script type="text/javascript" src="https://d3js.org/d3.v4.js"></script> -->
+    <script src="../js/d3-lasso.min.js"></script>
+
+    <!-- PROSIT Charts -->
+    <!-- glyphs scatter plot : svg1 -->
+    <script src="../js/glyphs.js"></script>
+    <!-- spiral time chart : svg2 -->
+    <script src="../js/radialTimeChart.js"></script>
+    <!-- loading symbol during buffer : svg2 -->
+    <script src="../js/buffering.js"></script>
+    <!-- parallel cordinate chart : svg3 & svg4 -->
+    <script src="../js/parallelCoordinateChart.js"></script>
+
+    <script>
+        // $('body').addClass('stop-scrolling')
+        // config
+        var glyphsChart = "chart1"
+        var parallelCordChart = "chart2"
+        var ids
+        var selectedId
+        var featurelist = $('#featureSelect').val()
+        var radius = +document.getElementById("myRange").value
+        var k
+        var toggleGlyph //'radialGlyph' for radial glyph and 'flowerGlyph' for flower glyph
+        var toggleDimRedux
+        var toggleDGrid
+        var toggleLabels //true for showing labels
+        var toggleSvgGrid //true for showing the grid
+        var delayInMilliseconds = 750
+
+        // jquery handlers for showing chart for random data on screen
+        {
+            // set a  ramdom value to select an id 
+            $.ajax({
+                type: "GET",
+                async: false,
+                url: "/getIds",
+                success: function(response) {
+                    ids = response
+                    selectedId = ids[Math.floor(Math.random() * ids.length)]
+                }
+            })
+            renderCharts()
+        }
+
+        // jquery handlers for initially setting the values of variables
+        {
+            if (!$("#toggleGlyph").is(':checked')) {
+                toggleGlyph = "radialGlyph"
+            } else {
+                toggleGlyph = "flowerGlyph"
+            }
+
+            if (!$("#toggleDimRedux").is(':checked')) {
+                toggleDimRedux = "TSNE"
+            } else {
+                toggleDimRedux = "PCA"
+            }
+
+            if (!$("#toggleDGrid").is(':checked')) {
+                toggleDGrid = true
+            } else {
+                toggleDGrid = false
+            }
+
+            if (!$("#toggleLabels").is(':checked')) {
+                toggleLabels = false
+            } else {
+                toggleLabels = true
+            }
+
+            if (!$("#toggleSvgGrid").is(':checked')) {
+                toggleSvgGrid = true
+            } else {
+                toggleSvgGrid = false
+            }
+
+            //number spinner for knn param +/-
+            $(document).ready(function() {
+                    const min = 1
+                    const max = ids.length
+                    k = $('.num-in span').parents('.num-block').find('input.in-num').val()
+                    $('.num-in span').click(function() {
+                        var $input = $(this).parents('.num-block').find('input.in-num')
+                        if ($(this).hasClass('minus')) {
+                            var count = parseFloat($input.val()) - 1
+                            count = count < min ? 1 : count
+                            if (count == min) {
+                                $(this).addClass('dis')
+                            } else {
+                                $(this).removeClass('dis')
+                            }
+                            $input.val(count)
+                        } else {
+                            var count = parseFloat($input.val()) + 1
+                            count = count > max ? max : count
+                            $input.val(count)
+                            if (count == max) {
+                                $(this).parents('.num-block').find(('.minus')).removeClass('dis')
+                            }
+                        }
+                        $input.change()
+                        return false
+                    })
+
+                })
+                // auto update the button for k param when input goes above the range
+            $('.num-in span').parents('.num-block').find('input.in-num').on("change", () => {
+                k = $('.num-in span').parents('.num-block').find('input.in-num').val()
+                if (k < 1) {
+                    $('.num-in span').parents('.num-block').find('input.in-num').val(1)
+                } else if (k > 150) {
+                    $('.num-in span').parents('.num-block').find('input.in-num').val(150)
+                }
+            })
+
+        }
+
+        // jquery handlers for regreshing charts after resizing
+        {
+            // auto refresh after window resizing
+            jQuery(function($) {
+                var windowWidth = $(window).width()
+                var windowHeight = $(window).height()
+                var id
+                $(window).resize(function() {
+                    clearTimeout(id)
+                    id = setTimeout(doneResizing, 500)
+                })
+
+                function doneResizing() {
+                    if (windowWidth != $(window).width() || windowHeight != $(window).height()) {
+                        location.reload()
+                        return
+                    }
+                }
+            })
+
+            // refresh after the side open or close using menu click event
+            var a = document.getElementById("menu")
+            a.addEventListener("click", function() {
+                renderCharts(500)
+            }, false)
+
+        }
+
+        // jquery handlers for the input types in the Menu
+        {
+            //range slider 
+            var slider = document.getElementById("myRange")
+            var output = document.getElementById("sliderVal")
+            output.innerHTML = slider.value
+            slider.oninput = function() {
+                radius = this.value
+                output.innerHTML = radius
+            }
+
+            // switch to select glyphs
+            $("#toggleGlyph").on('change', function() {
+                if (!$(this).is(':checked')) {
+                    toggleGlyph = "radialGlyph"
+                    $("#radialSwitch").addClass("selectedLabel")
+                    $("#flowerSwitch").removeClass("selectedLabel")
+                } else {
+                    toggleGlyph = "flowerGlyph"
+                    $("#radialSwitch").removeClass("selectedLabel")
+                    $("#flowerSwitch").addClass("selectedLabel")
+                }
+            })
+
+            // switch to select the type of dimensionality reduction
+            $("#toggleDimRedux").on('change', function() {
+                if (!$(this).is(':checked')) {
+                    toggleDimRedux = "TSNE"
+                    $("#tsneSwitch").addClass("selectedLabel")
+                    $("#pcaSwitch").removeClass("selectedLabel")
+                } else {
+                    toggleDimRedux = "PCA"
+                    $("#tsneSwitch").removeClass("selectedLabel")
+                    $("#pcaSwitch").addClass("selectedLabel")
+                }
+            })
+
+            // switch to use DGrid to remove overlap over the glyphs
+            $("#toggleDGrid").on('change', function() {
+                if (!$(this).is(':checked')) {
+                    toggleDGrid = true
+                    $("#useDGrid").addClass("selectedLabel")
+                    $("#noUseDGrid").removeClass("selectedLabel")
+                } else {
+                    toggleDGrid = false
+                    $("#useDGrid").removeClass("selectedLabel")
+                    $("#noUseDGrid").addClass("selectedLabel")
+                }
+            })
+
+            // switch to show or hide labels
+            $("#toggleLabels").on('change', function() {
+                if (!$(this).is(':checked')) {
+                    toggleLabels = false
+                    $("#hideLabels").addClass("selectedLabel")
+                    $("#showLables").removeClass("selectedLabel")
+                } else {
+                    toggleLabels = true
+                    $("#hideLabels").removeClass("selectedLabel")
+                    $("#showLables").addClass("selectedLabel")
+                }
+            })
+
+            // switch to show or hide grid
+            $("#toggleSvgGrid").on('change', function() {
+                if (!$(this).is(':checked')) {
+                    toggleSvgGrid = true
+                    $("#showSvgGrid").addClass("selectedLabel")
+                    $("#hideSvgGrid").removeClass("selectedLabel")
+                } else {
+                    toggleSvgGrid = false
+                    $("#hideSvgGrid").addClass("selectedLabel")
+                    $("#showSvgGrid").removeClass("selectedLabel")
+                }
+            })
+
+            // submit button
+            $("#Submit").click(function() {
+                featurelist = $('#featureSelect').val()
+                w = Math.floor($('.svg1')[0].getBoundingClientRect().width)
+                h = Math.floor($('.svg1')[0].getBoundingClientRect().height)
+                    // radius = +document.getElementById("myRange").value
+                var postForm = {
+                    "featureColumns": featurelist,
+                    "width": w,
+                    "height": h,
+                    "radius": radius,
+                    "k": k,
+                    "toggleDimRedux": toggleDimRedux,
+                    "toggleDGrid": toggleDGrid
+                }
+                $.ajax({
+                    type: "POST",
+                    contentType: 'application/json',
+                    data: JSON.stringify(postForm),
+                    url: "/dimReduceIds",
+                    success: function(status) {
+                        if (status === "status1:fileUpdated") {
+                            console.log("FeatureData file updated")
+                        }
+                        if (status === "status2:singleColumn") {
+                            alert("Please select more than one column in Feature selection drop down!!!")
+                            console.log("FeatureData file reset: single column selected")
+                        }
+                    }
+                })
+                renderCharts(4 * delayInMilliseconds)
+
+                //uncomment below line to hide the sidebar after submit button
+                // $("#sidebar").removeClass("show")
+            })
+        }
+
+        // Funtion to plot the charts
+        function renderCharts(delay = delayInMilliseconds) {
+            $("body").css("cursor", "wait")
+                //calling method that plots buffering symbol
+            buffering(glyphsChart, selectedId, toggleText = false)
+            buffering(parallelCordChart, selectedId)
+
+            setTimeout(function() {
+                //code to be executed after delay
+                updateGlyphs(glyphsChart, parallelCordChart, selectedId, featurelist, radius, toggleGlyph, toggleLabels, toggleSvgGrid)
+                updateParallelCord(parallelCordChart, selectedId, [], featurelist)
+                $("body").css("cursor", "default")
+            }, delay)
+        }
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,76 @@
+svg {
+    font-size: 16pt;
+}
+
+.foreground path {
+    fill: none;
+    stroke-opacity: 1;
+    stroke-width: 1.5px;
+}
+
+.background path {
+    fill: none;
+    stroke: gray;
+    stroke-opacity: 0.5;
+    stroke-width: 0.5px;
+}
+
+.foreground path.fade {
+    stroke: #000;
+    stroke-opacity: 0;
+}
+
+.legend {
+    font-size: 0.7em;
+    font-style: oblique;
+}
+
+.legend line {
+    fill: none;
+    stroke-width: 1px;
+}
+
+.setosa {
+    stroke: #800;
+}
+
+.versicolor {
+    stroke: #080;
+}
+
+.virginica {
+    stroke: #008;
+}
+
+.brush .selection {
+    fill-opacity: .5;
+    stroke: #fff;
+    shape-rendering: crispEdges;
+}
+
+.axis line,
+.axis path {
+    fill: none;
+    stroke: #000;
+    stroke-width: .5px;
+    shape-rendering: crispEdges;
+    opacity: 0.8
+}
+
+.axis text {
+    /* text-shadow: 0 1px 0 #fff; */
+    cursor: move;
+    font-size: 5pt;
+    opacity: 1;
+    fill: black
+}
+
+
+/* Brush no eixo */
+
+.brush .extent .selection {
+    fill: red;
+    fill-opacity: .3;
+    /* stroke: #fff; */
+    shape-rendering: crispEdges;
+}

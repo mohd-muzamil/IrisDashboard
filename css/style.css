@@ -1,0 +1,192 @@
+@import "https://fonts.googleapis.com/css?family=Poppins:300,400,500,600,700";
+html {
+    width: 100%;
+    height: 100%;
+}
+
+body {
+    width: 100%;
+    height: 100%;
+}
+
+/* .stop-scrolling {
+    height: 100%;
+    overflow: hidden;
+  } */
+
+#header {
+    /* background-color: red; */
+    height: 40px;
+}
+
+#dashboard {
+    height: calc(100% - 50px);
+    /* background-color: gray; */
+}
+
+.scaled {
+    transform: scale(0.8);
+}
+
+.num-block {
+    float: left;
+    width: 100%;
+    padding: 0px 15px 0px 30px;
+}
+
+
+/* number spinner for knn parameter skin 1 */
+
+.skin-1 .num-in {
+    float: left;
+    width: 94;
+}
+
+.skin-1 .num-in span {
+    display: block;
+    float: left;
+    width: 30px;
+    height: 25px;
+    line-height: 32px;
+    text-align: center;
+    position: relative;
+    cursor: pointer;
+}
+
+.skin-1 .num-in span.dis:before {
+    background-color: #ccc !important;
+}
+
+.skin-1 .num-in input {
+    float: left;
+    width: 30px;
+    height: 25px;
+    border: 1px solid #6E6F7A;
+    border-radius: 5px;
+    color: #000;
+    text-align: center;
+    padding: 0;
+}
+
+.skin-1 .num-in span.minus:before {
+    content: '';
+    position: absolute;
+    width: 15px;
+    height: 2px;
+    background-color: RGB(26, 97, 247);
+    top: 50%;
+    left: 0;
+}
+
+.skin-1 .num-in span.plus:before,
+.skin-1 .num-in span.plus:after {
+    content: '';
+    position: absolute;
+    right: 0px;
+    width: 15px;
+    height: 2px;
+    background-color: RGB(26, 97, 247);
+    top: 50%;
+}
+
+.skin-1 .num-in span.plus:after {
+    -webkit-transform: rotate(90deg);
+    -ms-transform: rotate(90deg);
+    -o-transform: rotate(90deg);
+    transform: rotate(90deg);
+}
+
+.line {
+    width: 100%;
+    margin-top: 0px;
+    margin-bottom: 0px;
+}
+
+p {
+    padding: 5px;
+    margin: 0px
+}
+
+svg {
+    border: solid 1px black;
+    margin-top: 3px;
+}
+
+.svg1 {
+    height: 70%;
+    width: 100%;
+    /* width: 58.6%; */
+}
+
+.svg2 {
+    height: 29%;
+    width: 100%;
+}
+
+#dashboardHeader {
+    text-align: center;
+    margin: 0px;
+}
+
+#sidebar-nav {
+    width: 160px;
+}
+
+.axis {
+    font: 10px sans-serif;
+}
+
+.axis path,
+.axis line {
+    fill: none;
+    stroke: #000;
+    shape-rendering: crispEdges;
+}
+
+#ex1Slider .slider-selection {
+    background: #BABABA;
+}
+
+td {
+    text-align: center;
+    /* center checkbox horizontally */
+    vertical-align: middle;
+    /* center checkbox vertically */
+}
+
+.selectedLabel {
+    color: #0275d8;
+    box-sizing: border-box;
+    width: 80%;
+    border: solid #808080 .2px;
+    border-radius: 5px;
+    padding: 1px;
+}
+
+.ui-autocomplete {
+    height: 200px;
+    overflow-y: auto;
+}
+
+.lasso path {
+    stroke: rgb(80, 80, 80);
+    stroke-width: 1.5px;
+}
+
+.lasso .drawn {
+    fill-opacity: 0.05;
+}
+
+.lasso .loop_close {
+    fill: none;
+    stroke-dasharray: 4, 4;
+}
+
+.lasso .origin {
+    /* fill:#3399FF; */
+    fill-opacity: .5;
+}
+
+.lassoselect {
+    cursor: wait;
+}
