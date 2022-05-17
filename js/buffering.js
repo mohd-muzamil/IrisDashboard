@@ -65,7 +65,7 @@ function buffering(chart, participantId, toggleText = true) {
         svg.selectAll('.arc1')
             .attr('transform', 'rotate(' + (phi0 + delta * speed / 200) + ')');
         svg.selectAll('.arc2')
-            .attr('transform', 'rotate(' + (phi0 + delta * speed / 150) + ')');
+            .attr('transform', 'rotate(' + -(phi0 + delta * speed / 150) + ')');
         svg.selectAll('.arc3')
             .attr('transform', 'rotate(' + (phi0 + delta * speed / 100) + ')');
     });

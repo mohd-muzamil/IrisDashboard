@@ -25,20 +25,24 @@ function parallelCord(chart, selectedId, lassoSelectedIds, featurelist) {
     var featuresCodes = featuresNames
     var titleText = "Feature comparison View"
 
-    var margin = { left: 20, top: 20, right: 35, bottom: 20 },
+    var margin = { left: 20, top: 20, right: 40, bottom: 20 },
         width = Math.floor(+$("#" + chart).width()),
         height = Math.floor(+$("#" + chart).height()),
         xHigh = (width - margin.left - margin.right),
         yHigh = (height - margin.top - margin.bottom)
-    deltawidth = xHigh / 4;
-    xHigh = xHigh - (4 - featurelist.length)*deltawidth
+
+    var deltaWidth = 0
+    if(featurelist.length>1)
+    {   
+        deltaWidth = (4 - featurelist.length)*xHigh / 4
+        xHigh = xHigh - deltaWidth
+    }
 
     const colorClusters = d3.scaleOrdinal().domain(["Setosa", "Versicolor", "Virginica"]).range(d3.schemeCategory10);
     const featureImportanceScale = d3.scaleSequential(d3.interpolateRdYlBu).domain([1, 0])
 
     var x = d3.scalePoint().domain(featuresCodes).range([margin.left, xHigh - margin.right]),
-        y = {},
-        formatDecimal = d3.format(".0f");
+        y = {}
 
     var line = d3.line(),
         background,
@@ -48,7 +52,7 @@ function parallelCord(chart, selectedId, lassoSelectedIds, featurelist) {
         .attr("width", margin.left + width + margin.right)
         .attr("height", margin.top + height + margin.bottom)
         .append("g")
-        .attr("transform", `translate(${margin.left + (4 - featurelist.length)*deltawidth/2}, ${margin.top})`)
+        .attr("transform", `translate(${margin.left + deltaWidth/2}, ${margin.top})`)
 
     postForm = { "id": selectedId }
     dragging = {}
@@ -76,7 +80,6 @@ function parallelCord(chart, selectedId, lassoSelectedIds, featurelist) {
                         .range([yHigh, 0]);
                 });
 
-
                 // Add gray background lines for context.
                 background = svg.append("svg:g")
                     .attr("class", "background")
@@ -87,7 +90,7 @@ function parallelCord(chart, selectedId, lassoSelectedIds, featurelist) {
                     .attr("stroke", d => colorClusters(d.variety))
 
                 // Add a title.
-                var title = svg.append("text")
+                svg.append("text")
                     .attr("x", xHigh / 2)
                     .attr("y", -margin.top+15)
                     .style("fill", "rgb(18, 113, 249)")
@@ -96,7 +99,7 @@ function parallelCord(chart, selectedId, lassoSelectedIds, featurelist) {
                     .style("text-anchor", "middle")
                     .text(titleText)
 
-                // Color legend.
+                // sequential Color legend for feature importance.
                 var colorLegend = d3.legendColor()
                     .labelFormat(d3.format(".1f"))
                     .scale(featureImportanceScale)
@@ -107,7 +110,7 @@ function parallelCord(chart, selectedId, lassoSelectedIds, featurelist) {
 
                 svg.append("g")
                     .attr("class", "legend")
-                    .attr("transform", `translate(${xHigh + (4 - featurelist.length)*deltawidth/2}, ${0}) scale(${0.5})`)
+                    .attr("transform", `translate(${xHigh + deltaWidth/2}, ${0}) scale(${0.5})`)
                     .call(colorLegend)
                     .style("opacity", 1);
                 
@@ -205,29 +208,12 @@ function parallelCord(chart, selectedId, lassoSelectedIds, featurelist) {
                     return g.transition().duration(750);
                     ``
                 }
+
                 // Returns the path for a given data point.
                 function path(d) {
                     return line(featuresCodes.map(function(p) {
                         return [position(p), y[p](d[p])];
                     }));
-                }
-
-                function dragstart(d) {
-                    i = featuresCodes.indexOf(d);
-                }
-
-                function drag(d) {
-                    x.range()[i] = d3.event.x; //unsovled issue
-                    featuresCodes.sort(function(a, b) { return x(a) - x(b); });
-                    g.attr("transform", function(d) { return "translate(" + x(d) + ")"; });
-                    foreground.attr("d", path);
-                }
-
-                function dragend(d) {
-                    //x.domain(featuresCodes).rangePoints([0, w]);
-                    var t = d3.transition().duration(500);
-                    t.selectAll(".trait").attr("transform", function(d) { return "translate(" + x(d) + ")"; });
-                    t.selectAll(".foreground path").attr("d", path);
                 }
 
                 foreground.classed("fade", function(d, i) {
@@ -244,6 +230,5 @@ function updateParallelCord(chart, selectedId, lassoSelectedIds, featurelist) {
         selectedId = selectedId[0]
     }
     d3.select("#" + chart).selectAll('*').remove(); //clearing the chart before plotting new data
-    // buffering(chart, selectedId); //calling method that plots buffering symbol
     parallelCord(chart, selectedId, lassoSelectedIds, featurelist)
 }
