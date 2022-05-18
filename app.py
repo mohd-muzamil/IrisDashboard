@@ -1,9 +1,6 @@
-from cProfile import label
 from flask import Flask, render_template, jsonify, request, redirect, url_for, send_file, make_response
 import pandas as pd
-import os
 import numpy as np
-import json
 
 # sklearn
 from sklearn.neighbors import KNeighborsClassifier
@@ -34,29 +31,25 @@ def DGridRemoveOverlap(dimReduxProjections, width, height, radius):
     return resultX, resultY
 
 
-def getTSNE(df, columns, DGrid, width, height, radius):
+def getTSNE(df, columns, width, height, radius):
     #TSNE projection
     tsne = TSNE(n_components=2, verbose=1,
                 perplexity=40, n_iter=300, init='random', learning_rate="auto")
     tsneResult = tsne.fit_transform(df.loc[:, columns])
     tsneResult = np.round(MinMaxScaler().fit_transform(tsneResult), 3)
-    if DGrid:
-        tsneX, tsneY = DGridRemoveOverlap(tsneResult, width, height, radius)
-    else:
-        tsneX, tsneY = tsneResult[:, 0], tsneResult[:, 1]
-    return tsneX, tsneY
+    tsneX, tsneY = tsneResult[:, 0], tsneResult[:, 1]
+    tsneX_overlapRemoved, tsneY_overlapRemoved = DGridRemoveOverlap(tsneResult, width, height, radius)
+    return tsneX, tsneY, tsneX_overlapRemoved, tsneY_overlapRemoved
 
 
-def getPCA(df, columns, DGrid, width, height, radius):
+def getPCA(df, columns, width, height, radius):
     #PCA projection
     pca = PCA(n_components=2)
     pcaResult = pca.fit_transform(df.loc[:, columns])
     pcaResult = np.round(MinMaxScaler().fit_transform(pcaResult), 3)
-    if DGrid:
-        pcaX, pcaY = DGridRemoveOverlap(pcaResult, width, height, radius)
-    else:
-        pcaX, pcaY = pcaResult[:, 0], pcaResult[:, 1]
-    return pcaX, pcaY
+    pcaX, pcaY = pcaResult[:, 0], pcaResult[:, 1]
+    pcaX_overlapRemoved, pcaY_overlapRemoved = DGridRemoveOverlap(pcaResult, width, height, radius)
+    return pcaX, pcaY, pcaX_overlapRemoved, pcaY_overlapRemoved
 
 
 def getClusters(df, columns, k):
@@ -106,8 +99,6 @@ def index():
 
 @app.route('/dimReduceIds', methods=['POST'])
 def dimReduceids():
-    global featureData
-
     featureData = pd.read_csv(os.path.join("data/rawData", featureFile))
 
     if request.method == 'POST':
@@ -118,30 +109,46 @@ def dimReduceids():
         radius = int(content["radius"])
         k = int(content["k"])
         toggleDimRedux = content["toggleDimRedux"]
-        toggleDGrid = content["toggleDGrid"]
-        if len(columns)<2:  #in case of feature columns are selected in dropdown, consider only those
-            columns = [col for col in list(featureData.columns) if col not in ["id", "variety"]]
-            message = "status2:singleColumn"
-        else:
-            message = "status1:fileUpdated"
 
         # dim reduction
-        if toggleDimRedux == "TSNE":
-            x, y = getTSNE(featureData, columns, toggleDGrid, width, height, radius)
-        elif toggleDimRedux == "PCA":
-            x, y = getPCA(featureData, columns, toggleDGrid, width, height, radius)
+        if toggleDimRedux == "tsne":
+            x, y, x_overlapRemoved, y_overlapRemoved = getTSNE(featureData, columns, width, height, radius)
+        elif toggleDimRedux == "pca":
+            x, y, x_overlapRemoved, y_overlapRemoved = getPCA(featureData, columns, width, height, radius)
         
         cluster = getClusters(featureData, columns, k)    #KNN clustering
         for column in [ feature for feature in featureData.columns if feature not in ["id", "variety"]]:
             featureData["scaled_"+column] = np.round(featureData[column] / featureData[column].abs().max(), 3)
 
         featureData["x"], featureData["y"] = x, y
+        featureData["x_overlapRemoved"], featureData["y_overlapRemoved"] = x_overlapRemoved, y_overlapRemoved
         featureData["cluster"] = cluster
         
+        featureData.dropna(axis=1, how='all', inplace=True)
         featureData.to_csv(os.path.join(
             "data/processedData", featureFile), index=False, header=True)
+        message = "status1:fileUpdated"
     return jsonify(message)
 
+@app.route('/knnClustering', methods=["POST"])
+def knnClustering():
+    """
+    This function is used to just calculate the k-nearest neighbours of the feature instances
+    """
+    featureData = pd.read_csv(os.path.join("data/processedData", featureFile))
+    if request.method == 'POST':
+        content = request.get_json()
+        columns = content["featureColumns"]
+        k = int(content["k"])
+
+        cluster = getClusters(featureData, columns, k)    #KNN clustering
+        featureData["cluster"] = cluster
+        featureData.dropna(axis=1, how='all', inplace=True)
+        featureData.to_csv(os.path.join(
+            "data/processedData", featureFile), index=False, header=True)
+        message = "status1:fileUpdated"
+
+    return jsonify(message)
 
 @app.route('/fetchProjections', methods=['GET'])
 def fetchProjections():

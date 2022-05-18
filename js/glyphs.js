@@ -1,5 +1,4 @@
-// function parallelCord(chart, selectedId, selectedIds, featurelist) {
-function plotGlyphs(glyphsChart, parallelCordChart, selectedId, featurelist, radius, toggleGlyph, toggleLabels, toggleSvgGrid) {
+function plotGlyphs(glyphsChart, parallelCordChart, selectedId, featurelist, radius, toggleGlyph, toggleDGrid, toggleLabels, toggleSvgGrid) {
     var scale = +radius / 25
     const config = {
         r: +radius,
@@ -244,7 +243,7 @@ function plotGlyphs(glyphsChart, parallelCordChart, selectedId, featurelist, rad
                                     d["scaled_" + "petal_width"],
                                     d["scaled_" + "sepal_length"],
                                 ].map((v, i) => [Math.PI * (i) / 2, radialScale(v)])))
-                                .attr("transform", `translate(${xScale(d.x)}, ${yScale(d.y)})`)
+                                .attr("transform", ()=>{ return toggleDGrid==true ? `translate(${xScale(d.x_overlapRemoved)}, ${yScale(d.y_overlapRemoved)})` : `translate(${xScale(d.x)}, ${yScale(d.y)})`})
                                 .attr("opacity", config.opacityHigh)
                                 .attr("stroke", colorClusters(d["cluster"]))
                                 .attr("stroke-width", config.strokeWidthHigh * 1)
@@ -273,12 +272,13 @@ function plotGlyphs(glyphsChart, parallelCordChart, selectedId, featurelist, rad
                                 .data(tPetals)
                                 .enter()
                                 .append("path")
-                                .attr("class", d => { return d.selectedId == selectedId ? "selectedGlyph" : null })
                                 .attr("d", function(v) {
                                     return customPath
                                 })
+                                .attr("class", d => { return d.id == selectedId ? "selectedGlyph" : null })
                                 .attr("transform", function(v, i) {
-                                    return `translate(${xScale(d.x)}, ${yScale(d.y)}), rotate(${360/config.petals * i}), scale(${v * config.r/100})`
+                                    translate = toggleDGrid==true ? `translate(${xScale(d.x_overlapRemoved)}, ${yScale(d.y_overlapRemoved)})` : `translate(${xScale(d.x)}, ${yScale(d.y)})`
+                                    return `${translate}, rotate(${360/config.petals * i}), scale(${v * config.r/100})`
                                 })
                                 .attr("opacity", config.opacityHigh)
                                 .attr("stroke", colorClusters(d["cluster"]))
@@ -295,8 +295,8 @@ function plotGlyphs(glyphsChart, parallelCordChart, selectedId, featurelist, rad
                         .enter()
                         .append("text")
                         .attr("class", "labelText")
-                        .attr("x", d => { return xScale(d.x) })
-                        .attr("y", d => { return yScale(d.y) })
+                        .attr("x", d => { return toggleDGrid==true ? xScale(d.x_overlapRemoved): xScale(d.x) })
+                        .attr("y", d => { return toggleDGrid==true ? yScale(d.y_overlapRemoved): yScale(d.y) })
                         .attr("dx", (-0.8 * config.r / 2) + "px")
                         .attr("dy", (config.r) + "px")
                         .attr("font-size", config.labelSize.toString() + "px")
@@ -312,8 +312,8 @@ function plotGlyphs(glyphsChart, parallelCordChart, selectedId, featurelist, rad
                         .enter()
                         .append("circle")
                         .attr("class", d => { return d.id == Id ? "hovercircle" : "hovercircle" })
-                        .attr("cx", d => { return xScale(d.x) })
-                        .attr("cy", d => { return yScale(d.y) })
+                        .attr("cx", d => { return toggleDGrid==true ? xScale(d.x_overlapRemoved): xScale(d.x) })
+                        .attr("cy", d => { return toggleDGrid==true ? yScale(d.y_overlapRemoved): yScale(d.y) })
                         .attr("r", config.r)
                         .classed("selectedGlyph", d => { return d.id == Id ? true : false })
                         .attr("opacity", d => { return d.id == Id ? config.opacityHigh : config.opacityLow })
@@ -679,8 +679,9 @@ function plotGlyphs(glyphsChart, parallelCordChart, selectedId, featurelist, rad
             })
     }
 
-function updateGlyphs(glyphsChart, parallelCordChart, selectedId, featurelist, radius, toggleGlyph, toggleLabels, toggleSvgGrid) {
+    
+function updateGlyphs(glyphsChart, parallelCordChart, selectedId, featurelist, radius, toggleGlyph, toggleDGrid, toggleLabels, toggleSvgGrid) {
     d3.selectAll(".Tooltip").remove()
     d3.select("#" + glyphsChart).selectAll("*").remove()
-    plotGlyphs(glyphsChart, parallelCordChart, selectedId, featurelist, radius, toggleGlyph, toggleLabels, toggleSvgGrid)
+    plotGlyphs(glyphsChart, parallelCordChart, selectedId, featurelist, radius, toggleGlyph, toggleDGrid, toggleLabels, toggleSvgGrid)
 }

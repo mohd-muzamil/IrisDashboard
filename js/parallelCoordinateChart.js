@@ -22,8 +22,6 @@ function parallelCord(chart, selectedId, lassoSelectedIds, featurelist) {
             importanceScores = Object.values(data)
         }
     })
-    var featuresCodes = featuresNames
-    var titleText = "Feature comparison View"
 
     var margin = { left: 20, top: 20, right: 40, bottom: 20 },
         width = Math.floor(+$("#" + chart).width()),
@@ -31,6 +29,7 @@ function parallelCord(chart, selectedId, lassoSelectedIds, featurelist) {
         xHigh = (width - margin.left - margin.right),
         yHigh = (height - margin.top - margin.bottom)
 
+    var titleText = "Feature comparison View"
     var deltaWidth = 0
     if(featurelist.length>1)
     {   
@@ -38,8 +37,9 @@ function parallelCord(chart, selectedId, lassoSelectedIds, featurelist) {
         xHigh = xHigh - deltaWidth
     }
 
+    var featuresCodes = featuresNames
     const colorClusters = d3.scaleOrdinal().domain(["Setosa", "Versicolor", "Virginica"]).range(d3.schemeCategory10);
-    const featureImportanceScale = d3.scaleSequential(d3.interpolateRdYlBu).domain([1, 0])
+    const featureImportanceScale = d3.scaleSequential(d3.interpolatePurples).domain([0, 1])
 
     var x = d3.scalePoint().domain(featuresCodes).range([margin.left, xHigh - margin.right]),
         y = {}
@@ -56,6 +56,7 @@ function parallelCord(chart, selectedId, lassoSelectedIds, featurelist) {
 
     postForm = { "id": selectedId }
     dragging = {}
+
 
     d3.csv("fetchAggFeatures")
         .header("Content-Type", "application/json")
@@ -134,15 +135,16 @@ function parallelCord(chart, selectedId, lassoSelectedIds, featurelist) {
                     .data(filteredData)
                     .enter().append("svg:path")
                     .attr("d", path)
+                    .attr("opacity", function(d) {
+                        return d.id == selectedId ? 1 : 0.7;
+                    })
                     .attr("stroke", function(d) {
                         return d.id != selectedId ? colorClusters(d["variety"]) : "black";
                     })
                     .attr("stroke-width", function(d) {
                         return d.id != selectedId ? "1.5px" : "2px";
                     })
-                    .attr("opacity", function(d) {
-                        return d.id == selectedId ? 1 : 0.7;
-                    })
+
 
                 // Add a group element for each trait.
                 var g = svg.selectAll(".featuresCodes")
@@ -157,7 +159,7 @@ function parallelCord(chart, selectedId, lassoSelectedIds, featurelist) {
                         })
                         .on("drag", function(d) {
                             dragging[d] = Math.min(width, Math.max(0, d3.event.x));
-                            foreground.attr("d", path);
+                            foreground.attr("d", path)
                             background.attr("d", path)
                             featuresCodes.sort(function(a, b) { return position(a) - position(b); });
                             x.domain(featuresCodes);
@@ -206,7 +208,6 @@ function parallelCord(chart, selectedId, lassoSelectedIds, featurelist) {
 
                 function transition(g) {
                     return g.transition().duration(750);
-                    ``
                 }
 
                 // Returns the path for a given data point.

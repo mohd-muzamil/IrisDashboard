@@ -17,12 +17,12 @@ body {
 }
 
 #dashboard {
-    height: calc(100% - 50px);
+    height: calc(100% - 30px);
     /* background-color: gray; */
 }
 
 .scaled {
-    transform: scale(0.8);
+    transform: scale(0.9);
 }
 
 .num-block {
@@ -93,11 +93,23 @@ body {
     transform: rotate(90deg);
 }
 
-.line {
-    width: 100%;
-    margin-top: 0px;
-    margin-bottom: 0px;
-}
+hr {
+    margin-top: 0em !important;
+    margin-bottom: 1em !important;
+    border-width: 2px;
+  }
+  
+hr.double {
+    margin-top: 0em !important;
+    margin-bottom: 0em !important;
+    border-width: 5px;
+  }
+
+br {
+    display: block;
+    content: "";
+    margin: 5px 0;
+ }
 
 p {
     padding: 5px;
@@ -105,19 +117,19 @@ p {
 }
 
 svg {
-    border: solid 1px black;
+    border: solid 1px #000;
     margin-top: 3px;
 }
 
 .svg1 {
     height: 70%;
-    width: 100%;
+    width: 99.5%;
     /* width: 58.6%; */
 }
 
 .svg2 {
     height: 29%;
-    width: 100%;
+    width: 99.5%;
 }
 
 #dashboardHeader {
@@ -126,8 +138,23 @@ svg {
 }
 
 #sidebar-nav {
-    width: 160px;
+    width: 180px;
 }
+
+.slider{
+    width: 90%;
+    height:100%;
+}
+
+.button {
+    background-color: rgb(18, 113, 249);
+    border: none;
+    color: white;
+    text-align: center;
+    display: inline-block;
+    border-radius: 50%;
+  }
+
 
 .axis {
     font: 10px sans-serif;
@@ -154,10 +181,10 @@ td {
 .selectedLabel {
     color: #0275d8;
     box-sizing: border-box;
-    width: 80%;
+    width: 100%;
     border: solid #808080 .2px;
     border-radius: 5px;
-    padding: 1px;
+    padding-left: 50px 0;
 }
 
 .ui-autocomplete {
@@ -187,3 +214,14 @@ td {
 .lassoselect {
     cursor: wait;
 }
+
+/* toggle button styling */
+.toggle.round,
+        .toggle-on.round,
+        .toggle-off.round {
+            border-radius: 20rem;
+        }
+        
+        .toggle.round .toggle-handle {
+            border-radius: 20rem;
+        }
