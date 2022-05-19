@@ -39,7 +39,7 @@ function parallelCord(chart, selectedId, lassoSelectedIds, featurelist) {
 
     var featuresCodes = featuresNames
     const colorClusters = d3.scaleOrdinal().domain(["Setosa", "Versicolor", "Virginica"]).range(d3.schemeCategory10);
-    const featureImportanceScale = d3.scaleSequential(d3.interpolatePurples).domain([0, 1])
+    const featureImportanceScale = d3.scaleSequential(d3.interpolate("#5D3FD3", "#FFFFFF")).domain([1, 0])
 
     var x = d3.scalePoint().domain(featuresCodes).range([margin.left, xHigh - margin.right]),
         y = {}
@@ -199,6 +199,7 @@ function parallelCord(chart, selectedId, lassoSelectedIds, featurelist) {
                         return featureImportanceScale(importanceScores[i])
                     })
                     .attr("stroke", "black")
+                    .attr("stroke-width", 0.4)
                     .attr("opacity", 1)
 
                 function position(d) {

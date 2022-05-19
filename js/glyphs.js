@@ -1,13 +1,14 @@
 function plotGlyphs(glyphsChart, parallelCordChart, selectedId, featurelist, radius, toggleGlyph, toggleDGrid, toggleLabels, toggleSvgGrid) {
-    var scale = +radius / 25
+    delta = radius/100
     const config = {
         r: +radius,
         opacityLow: 0,
         opacityHigh: 1,
         opacityClickLow: 0.2,
-        opacityClickHigh: 0.5,
-        strokeWidthLow: 0.4 * scale,
-        strokeWidthHigh: 2 * scale,
+        opacityClickMid: 0.45,
+        opacityClickHigh: 0.6,
+        strokeWidthLow: 0.5 - delta,
+        strokeWidthHigh: 2 - delta,
         fillColor: "transparent",
         fillColorLasso: "#636363",
         petals: 4, //no of petals in the glyph
@@ -81,10 +82,10 @@ function plotGlyphs(glyphsChart, parallelCordChart, selectedId, featurelist, rad
                 .attr("x2", d => { return d })
                 .attr("y2", height)
                 .style("opacity", (d, i) => {
-                    return i % Math.ceil(100 / config.grid_size) == 0 ? config.opacityLow * 2 : config.opacityLow
+                    return i % Math.ceil(100 / config.grid_size) == 0 ? config.opacityLow * 1.0 : config.opacityLow * 0.6
                 })
                 .style("stroke", "black")
-                .style("stroke-width", config.strokeWidthLow)
+                .style("stroke-width", (d,i)=>{return i % Math.ceil(100 / config.grid_size) == 0 ? config.strokeWidthLow * 1.5 : config.strokeWidthLow})
 
             svgGrid.append("g").attr("class", "horizontal")
                 .selectAll("line")
@@ -95,10 +96,10 @@ function plotGlyphs(glyphsChart, parallelCordChart, selectedId, featurelist, rad
                 .attr("x2", width)
                 .attr("y2", d => { return d })
                 .style("opacity", (d, i) => {
-                    return i % Math.ceil(100 / config.grid_size) == 0 ? config.opacityLow * 2 : config.opacityLow
+                    return i % Math.ceil(100 / config.grid_size) == 0 ? config.opacityLow * 1.0 : config.opacityLow * 0.6
                 })
                 .style("stroke", "black")
-                .style("stroke-width", config.strokeWidthLow)
+                .style("stroke-width", (d,i)=>{return i % Math.ceil(100 / config.grid_size) == 0 ? config.strokeWidthLow * 1.5 : config.strokeWidthLow})
 
             // Legends
             var legendOrdinal = d3.legendColor()
@@ -113,7 +114,7 @@ function plotGlyphs(glyphsChart, parallelCordChart, selectedId, featurelist, rad
                 .on("cellclick", function(e) {
                     d3.selectAll(".hovercircle")
                         .classed("selectedLasso", false)
-                        .attr("opacity", d => { return d.id == selectedId ? config.opacityHigh : config.opacityLow })
+                        .attr("opacity", d => { return (d.id == selectedId | d.variety != d.cluster) ? config.opacityHigh : config.opacityLow })
                         .attr("stroke", "black")
                         .attr("stroke-width", d => { return d.id == selectedId ? config.strokeWidthHigh : config.strokeWidthLow })
                         .style("fill", config.fillColor)
@@ -121,12 +122,10 @@ function plotGlyphs(glyphsChart, parallelCordChart, selectedId, featurelist, rad
                     d3.selectAll(".hovercircle")
                         .filter(d => { return d["variety"] == e })
                         .classed("selectedLasso", true)
-                        .attr("opacity", d => {
-                            return (d.id == selectedId) ? config.opacityClickHigh : config.opacityClickLow
-                        })
+                        .attr("opacity", d => { return d.id == selectedId ? config.opacityClickHigh : d.variety != d.cluster ? config.opacityClickMid :config.opacityClickLow })
                         .attr("stroke", "black")
                         .attr("stroke-width", d => {
-                            return (d.id == selectedId) ? config.strokeWidthHigh : config.strokeWidthHigh / 3
+                            return (d.id == selectedId ) ? config.strokeWidthHigh : config.strokeWidthLow
                         })
                         .style("fill", d => {
                             return (d.id == selectedId) ? config.fillColorLasso : config.fillColorLasso
@@ -155,7 +154,7 @@ function plotGlyphs(glyphsChart, parallelCordChart, selectedId, featurelist, rad
                     .style("border-radius", "5px")
                     .style("padding", "1px")
                     .style("pointer-events", "none")
-                    .style("opacity", 0.8 * config.opacityHigh)
+                    .style("opacity", 0.85 * config.opacityHigh)
 
                 function tooltip_mousemove(dx = 0, dy = 0) {
                     X = d3.event.pageX + dx + 15
@@ -316,9 +315,11 @@ function plotGlyphs(glyphsChart, parallelCordChart, selectedId, featurelist, rad
                         .attr("cy", d => { return toggleDGrid==true ? yScale(d.y_overlapRemoved): yScale(d.y) })
                         .attr("r", config.r)
                         .classed("selectedGlyph", d => { return d.id == Id ? true : false })
-                        .attr("opacity", d => { return d.id == Id ? config.opacityHigh : config.opacityLow })
+                        .attr("opacity", d => { return (d.id == Id | d.variety != d.cluster) ? config.opacityHigh : config.opacityLow })
                         .attr("stroke", "black")
-                        .attr("stroke-width", d => { return d.id == Id ? config.strokeWidthHigh : config.strokeWidthLow })
+                        .attr("stroke-width", d => {
+                            return d.id == selectedId ? config.strokeWidthHigh : config.strokeWidthLow
+                        })
                         .style("fill", config.fillColor)
                         
                         .on("mousemove", () => {
@@ -348,11 +349,11 @@ function plotGlyphs(glyphsChart, parallelCordChart, selectedId, featurelist, rad
                                 // console.log("case2")
                                 svgGlyphs.selectAll(".selectedGlyph")
                                     .classed("selectedGlyph", false)
-                                    .attr("opacity", config.opacityLow)
+                                    .attr("opacity", d => { return (d.id == selectedId | d.variety != d.cluster) ? config.opacityHigh : config.opacityLow })
                                     .attr("stroke-width", config.strokeWidthLow)
                                     .style("fill", config.fillColor)
                                 svgGlyphs.selectAll(".selectedLasso")
-                                    .attr("opacity", config.opacityClickLow)
+                                .attr("opacity", d => { return d.variety != d.cluster ? config.opacityClickMid :config.opacityClickLow })
                                     .attr("stroke-width", config.strokeWidthLow)
                                     .style("fill", config.fillColorLasso)
                                 d3.select(this)
@@ -360,6 +361,7 @@ function plotGlyphs(glyphsChart, parallelCordChart, selectedId, featurelist, rad
                                     .attr("opacity", config.opacityClickHigh)
                                     .attr("stroke-width", config.strokeWidthHigh)
                                     .style("fill", config.fillColorLasso)
+                                plotParallelCord()
                             }
                             // case3: pre-selected not lasso-selected
                             else if (classCurrentSelection.includes("hovercircle") & classCurrentSelection.includes("selectedGlyph")) {
@@ -379,11 +381,11 @@ function plotGlyphs(glyphsChart, parallelCordChart, selectedId, featurelist, rad
                                 // console.log("case4")
                                 svgGlyphs.selectAll(".selectedGlyph")
                                     .classed("selectedGlyph", false)
-                                    .attr("opacity", config.opacityLow)
+                                    .attr("opacity", d => { return (d.variety != d.cluster) ? config.opacityHigh : config.opacityLow })
                                     .attr("stroke-width", config.strokeWidthLow)
                                     .style("fill", config.fillColor)
                                 svgGlyphs.selectAll(".selectedLasso")
-                                    .attr("opacity", config.opacityClickLow)
+                                    .attr("opacity", d => { return d.variety != d.cluster ? config.opacityClickMid : config.opacityClickLow })
                                     .attr("stroke-width", config.strokeWidthLow)
                                     .style("fill", config.fillColorLasso)
                                 d3.select(this)
@@ -391,8 +393,8 @@ function plotGlyphs(glyphsChart, parallelCordChart, selectedId, featurelist, rad
                                     .attr("opacity", config.opacityHigh)
                                     .attr("stroke-width", config.strokeWidthHigh)
                                     .style("fill", config.fillColor)
+                                plotParallelCord()
                             }
-                            plotParallelCord()
                         })
                 }
 
@@ -409,7 +411,7 @@ function plotGlyphs(glyphsChart, parallelCordChart, selectedId, featurelist, rad
                                 return (d.id == selectedId) ? config.fillColorLasso : config.fillColorLasso
                             })
                             .attr("opacity", (d) => {
-                                return (d.id == selectedId) ? config.opacityClickHigh : config.opacityClickLow
+                                return (d.id == selectedId) ? config.opacityClickHigh : d.variety != d.cluster ? config.opacityClickMid : config.opacityClickLow
                             })
                             .attr("stroke", "black")
                             .attr("stroke-width", (d) => {

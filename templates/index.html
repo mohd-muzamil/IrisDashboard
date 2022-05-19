@@ -93,8 +93,8 @@
                                 <span style="font-size: 13px; text-align: left;" onclick=alertDimRedux()><i class="fa-solid fa-circle-question"></i></span>
                                 <label class="form-check-label" for="toggleDimRedux" style="font-size: 13px; font-weight:500; ">2-D projection</label>
                                 <div class="row m-0 p-0">
-                                    <div class="col-10 m-0 p-0 pl-2 pt-1">
-                                        <input class="pl-3" type="checkbox" checked data-toggle="toggle" data-style="round" data-size="xs" data-width=80 data-on="PCA" data-off="t-SNE" id="toggleDimRedux">
+                                    <div class="col-10 m-0 p-0 pl-3 pt-1">
+                                        <input type="checkbox" checked data-toggle="toggle" data-style="round" data-size="xs" data-width=85 data-on="PCA" data-off="t-SNE" id="toggleDimRedux">
                                     </div>
                                     <div class="col-2 m-0 p-0 pt-1">
                                         <button class="button" id="btn-toggleDimRedux">
@@ -188,9 +188,6 @@
             // buttonClass: 'btn btn-link',
             numberDisplayed: 1
         })
-
-        $('#toggleDimRedux').bootstrapToggle('off')
-        $('#toggleLabels').bootstrapToggle('off')
     </script>
 
     <!-- Imports -->
@@ -213,6 +210,7 @@
         var ids
         var selectedId
         var featurelist = $('#featureSelect').val()
+        var currentfeaturelistPCP = featurelist
         var radius = +document.getElementById("myRange").value
         var k
         var toggleGlyph //'radialGlyph' for radialGlyph glyph and 'flowerGlyph' for flowerGlyph glyph
@@ -220,7 +218,16 @@
         var toggleDGrid
         var toggleLabels //true for showing labels
         var toggleSvgGrid //true for showing the grid
-        var delayInMilliseconds = 500
+        var delayInMilliseconds = 750
+
+        // setting up the default states for toggle swtiches
+        {
+        $('#toggleDimRedux').bootstrapToggle('off')  //on-pca off-tsne
+        $('#toggleGlyph').bootstrapToggle('on')    //on-flower off-radial
+        $('#toggleDGrid').bootstrapToggle('on')     //on-overlapRemove off-keepOverlap
+        $('#toggleLabels').bootstrapToggle('off')   //on-showLabels off-hideLabels
+        $('#toggleSvgGrid').bootstrapToggle('on')   //on-keepGrid off-hideGrid
+        }
 
         // jquery handlers for initially setting the values of variables
         {
@@ -255,8 +262,6 @@
             }
             
             k = $('.num-in span').parents('.num-block').find('input.in-num').val()
-            toggleDimRedux = "tsne"
-            toggleDGrid = true
 
             //number spinner for knn param +/-
             $(document).ready(function() {
@@ -265,23 +270,19 @@
                 k = $('.num-in span').parents('.num-block').find('input.in-num').val()
                 $('.num-in span').click(function() {
                     var $input = $(this).parents('.num-block').find('input.in-num')
-                    if ($(this).hasClass('minus')) {
-                        var count = parseFloat($input.val()) - 1
-                        count = count < min ? 1 : count
-                        if (count == min) {
-                            $(this).addClass('dis')
-                        } else {
-                            $(this).removeClass('dis')
-                        }
-                        $input.val(count)
-                    } else {
-                        var count = parseFloat($input.val()) + 1
-                        count = count > max ? max : count
-                        $input.val(count)
-                        if (count == max) {
-                            $(this).parents('.num-block').find(('.minus')).removeClass('dis')
-                        }
+                    if ($(this).hasClass('plus')) k++
+                    else k--
+                    if (k <= min) {
+                        $(this).parents('.num-block').find(('.minus')).addClass('dis')
                     }
+                    else if (k >= max){
+                        $(this).parents('.num-block').find(('.plus')).addClass('dis')
+                    }
+                    else{
+                        $(this).parents('.num-block').find(('.minus')).removeClass('dis')
+                        $(this).parents('.num-block').find(('.plus')).removeClass('dis')
+                    }
+                    $input.val(k)
                     $input.change()
                     return false
                 })
@@ -299,8 +300,7 @@
                     selectedId = ids[Math.floor(Math.random() * ids.length)]
                 }
             })
-            process()
-            renderChartsPCP()
+            process(true, delayInMilliseconds)
         }
 
             // auto update the button for k param when input goes above the range
@@ -324,7 +324,7 @@
                 var id
                 $(window).resize(function() {
                     clearTimeout(id)
-                    id = setTimeout(doneResizing, 500)
+                    id = setTimeout(doneResizing, 750)
                 })
 
                 function doneResizing() {
@@ -338,7 +338,7 @@
             // refresh after the side open or close using menu click event
             var a = document.getElementById("menu")
             a.addEventListener("click", function() {
-                renderChartsGlyphs(500)
+                renderCharts(true, delayInMilliseconds)
             }, false)
 
         }
@@ -362,7 +362,7 @@
                     toggleGlyph = "radialGlyph"
                 }
                 // console.log("toggleGlyph: ", toggleGlyph)
-                renderChartsGlyphs()
+                renderCharts()
             })
 
             // switch to select the type of dimensionality reduction
@@ -381,7 +381,7 @@
                     toggleDGrid = false
                 }
                 // console.log("toggleDGrid: ", toggleDGrid)
-                renderChartsGlyphs()
+                renderCharts()
             })
 
             // switch to show or hide labels
@@ -392,7 +392,7 @@
                     toggleLabels = false
                 }
                 // console.log("toggleLabels: ", toggleLabels)
-                renderChartsGlyphs()
+                renderCharts()
             })
 
             // switch to show or hide grid
@@ -403,28 +403,28 @@
                     toggleSvgGrid = false
                 }
                 // console.log("toggleSvgGrid: ", toggleSvgGrid)
-                renderChartsGlyphs()
+                renderCharts()
             })
 
             // menu button click events
             $("#btn-featureSelection").click(function() {
-                process(delayInMilliseconds)
-                renderChartsPCP()
+                process(true, delayInMilliseconds)
             })
             $("#btn-knn").click(function() {
-                processKNN(delayInMilliseconds)
+                processKNN(false, delayInMilliseconds)
             })
             $("#btn-toggleDimRedux").click(function() {
-                process(delayInMilliseconds)
+                process(false, delayInMilliseconds)
             })
             $("#btn-glyphRadius").click(function() {
-                process(delayInMilliseconds)
+                process(false, delayInMilliseconds)
             })
         }
 
         // function to call the server route which computes the ML algorithms.
-        function process(delay=delayInMilliseconds) {
+        function process(PCP=false, delay=delayInMilliseconds) {
             featurelist = $('#featureSelect').val()
+            if (JSON.stringify(currentfeaturelistPCP)!=JSON.stringify(featurelist) ) PCP=true
             if(featurelist.length<2)
             {   
                 alert("Please select more than one column in Feature selection drop down!!!")
@@ -440,7 +440,6 @@
                     "k": k,
                     "toggleDimRedux": toggleDimRedux
                 }
-                console.log(postForm)
                 $.ajax({
                     type: "POST",
                     contentType: 'application/json',
@@ -454,16 +453,19 @@
                     }
                 })
             buffering(glyphsChart, selectedId, toggleText = false)
-            renderChartsGlyphs(delay)
+            if(PCP==true){buffering(parallelCordChart, selectedId)}
+            renderCharts(PCP, delay)
             //uncomment below line to hide the sidebar after submit button
             // $("#sidebar").removeClass("show")
             }
         }
         
-        function processKNN(){
-            postForm = { "featureColumns":featurelist, "k":k }
+        function processKNN(PCP=false, delay=0){
+            featurelist = $('#featureSelect').val()
+            if (JSON.stringify(currentfeaturelistPCP)!=JSON.stringify(featurelist) ) PCP=true
             if (featurelist.length<2){alert("Please select more than one column in Feature selection drop down!!!")}
             else {
+                postForm = { "featureColumns":featurelist, "k":k }
                 $.ajax({
                     type: "POST",
                     contentType: 'application/json',
@@ -475,31 +477,24 @@
                             // console.log("FeatureData file updated")
                             }
                         else console.log("unknown status", status, "File has been reset using default values")
-                        renderChartsGlyphs()
+                        renderCharts(PCP, delay)
                     }
                 })
             }
         }
 
-        // Funtion to plot the only glyph-view
-        function renderChartsGlyphs(delay = 0) {
+        // Funtion to plot the glyph-view and PCP-view
+        function renderCharts(PCP=false, delay=0) {
             $("body").css("cursor", "wait")
             //calling method that plots buffering symbol
             setTimeout(function() {
                 //code to be executed after delay
                 updateGlyphs(glyphsChart, parallelCordChart, selectedId, featurelist, radius, toggleGlyph, toggleDGrid, toggleLabels, toggleSvgGrid)
+                if(PCP==true){
+                    updateParallelCord(parallelCordChart, selectedId, [], featurelist)
+                    currentfeaturelistPCP = $('#featureSelect').val()
+                }
                 $("body").css("cursor", "default")
-            }, delay)
-        }
-
-        // Funtion to plot the glyph-view and PCP-view
-        function renderChartsPCP(delay = 0) {
-            //calling method that plots buffering symbol
-            buffering(parallelCordChart, selectedId)
-
-            setTimeout(function() {
-                //code to be executed after delay
-                updateParallelCord(parallelCordChart, selectedId, [], featurelist)
             }, delay)
         }
 

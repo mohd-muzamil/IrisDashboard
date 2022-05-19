@@ -22,8 +22,8 @@ def DGridRemoveOverlap(dimReduxProjections, width, height, radius):
     x = np.expand_dims(dimReduxProjections[:, 0], axis=1)
     y = np.expand_dims(dimReduxProjections[:, 1], axis=1)
     cords = np.concatenate((x, y), axis=1)
-    icon_width = 1/(width/(2*radius))
-    icon_height = 1/(height/(2*radius))
+    icon_width = 1/(width/(1.1*2*radius))
+    icon_height = 1/(height/(1.1*2*radius))
 
     dimReduxProjectionsOverlapRemoved = DGrid(icon_width, icon_height, delta=1).fit_transform(cords)
     resultX = np.round(dimReduxProjectionsOverlapRemoved[:, 0], 3)
