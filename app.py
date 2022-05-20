@@ -1,3 +1,5 @@
+# Back-End server using Flask to create routes used to serve the dashboard.
+
 from flask import Flask, render_template, jsonify, request, redirect, url_for, send_file, make_response
 import pandas as pd
 import numpy as np
@@ -64,37 +66,46 @@ def getClusters(df, columns, k):
 
 
 def getFeatureImportance(df, columns):
+    # Feature imporance score is measured by training an XGboost model.
     label = "variety"
     le = LabelEncoder().fit(df[label].values)
     df["label"] = le.transform(df[label].values)
     X, y = df.loc[:, columns], df.loc[:, "label"]
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.05, random_state=42)
+    # X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.05, random_state=42)
+    X_train, y_train = X, y     #no test set, since all of the instances are needed to calculate the feature importance
+    
     xgb_clf = xgb.XGBClassifier()
-    # es = xgb.callback.EarlyStopping(
-    #     rounds=2,
-    #     abs_tol=1e-3,
-    #     save_best=True,
-    #     maximize=False,
-    #     data_name="validation_0",
-    #     metric_name="mlogloss",
-    # )
     xgb_clf.fit(X_train, y_train)
-    # perm_importance = permutation_importance(xgb_clf, X_test, y_test)
-    # sorted_idx = perm_importance.importances_mean.argsort()
-    importanceScore = np.round(xgb_clf.feature_importances_, 3)
+    #feature importance using XGboost model alone
+    importanceScore = xgb_clf.feature_importances_
+
+    #Permutation importance for feature evaluation using XGboost classifier. Works better in cases with test data, which is different that train data used for model fitting.
+    # importanceScore = permutation_importance(xgb_clf, X_train, y_train).importances_mean
+
+    importanceScore = np.round(importanceScore, 3)
     return dict(sorted(zip(columns, [str(x) for x in importanceScore])))
 
 
 app = Flask(__name__, static_url_path='', static_folder='')
-@app.route("/ping")
-def hello_world():
-    return jsonify("pong")
 
 
 @app.route('/')
 @app.route('/index.html')
 def index():
     return render_template('index.html', title="Home", header="Home")
+
+
+@app.errorhandler(404)
+def page_not_found(e):
+    return render_template('index.html'), 404
+
+
+# Get a list of distinct Ids
+@app.route('/getIds', methods=['GET'])
+def getIds():
+    featureData = pd.read_csv(os.path.join("data/rawData", featureFile))
+    ids = featureData["id"].unique().tolist()
+    return jsonify(ids)
 
 
 @app.route('/dimReduceIds', methods=['POST'])
@@ -130,6 +141,7 @@ def dimReduceids():
         message = "status1:fileUpdated"
     return jsonify(message)
 
+
 @app.route('/knnClustering', methods=["POST"])
 def knnClustering():
     """
@@ -150,7 +162,8 @@ def knnClustering():
 
     return jsonify(message)
 
-@app.route('/fetchProjections', methods=['GET'])
+
+@app.route('/getProjections', methods=['GET'])
 def fetchProjections():
     """
     Return Data for Chart1: Personality scores that are used to make glyphs
@@ -164,7 +177,7 @@ def fetchProjections():
         return resp
 
 
-@app.route('/fetchAggFeatures', methods=['POST'])
+@app.route('/getAggFeatures', methods=['POST'])
 def fetchAggFeatures():
     """
     Returns Data for Parallel cordinate chart to visualize extracted features
@@ -186,19 +199,11 @@ def fetchAggFeatures():
         resp.headers["Content-Type"] = "text/csv"
         return resp
 
-
-# Get a list of distinct Ids
-@app.route('/getIds', methods=['GET'])
-def getIds():
-    featureData = pd.read_csv(os.path.join("data/rawData", featureFile))
-    ids = featureData["id"].unique().tolist()
-    return jsonify(ids)
-
 # Sort features based on their feature importance: 
 # Permutation Based Feature Importance using XGBoost is used to calculate feature importance
 # https://mljar.com/blog/feature-importance-xgboost/
 # https://explained.ai/rf-importance/
-@app.route('/featureImportance', methods=['POST'])
+@app.route('/getFeatureImportance', methods=['POST'])
 def featureImportance():
     """
     Returns a list of features sorted based on their importance to classify the dataset. 

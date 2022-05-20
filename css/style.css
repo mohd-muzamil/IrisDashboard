@@ -2,13 +2,13 @@
 html {
     width: 100%;
     height: 100%;
-    overflow:hidden;
+    overflow: hidden;
 }
 
 body {
     width: 100%;
     height: 100%;
-    overflow:hidden;
+    overflow: hidden;
 }
 
 #header {
@@ -96,20 +96,19 @@ body {
 hr {
     margin-top: 0em !important;
     margin-bottom: 1em !important;
-    border-width: 2px;
-  }
-  
+}
+
 hr.double {
     margin-top: 0em !important;
     margin-bottom: 0em !important;
-    border-width: 5px;
-  }
+    border-width: 3px;
+}
 
 br {
     display: block;
     content: "";
     margin: 5px 0;
- }
+}
 
 p {
     padding: 5px;
@@ -122,13 +121,13 @@ svg {
 }
 
 .svg1 {
-    height: 70%;
+    height: 65%;
     width: 99.5%;
     /* width: 58.6%; */
 }
 
 .svg2 {
-    height: 29%;
+    height: 35%;
     width: 99.5%;
 }
 
@@ -138,12 +137,12 @@ svg {
 }
 
 #sidebar-nav {
-    width: 180px;
+    width: 170px;
 }
 
-.slider{
+.slider {
     width: 90%;
-    height:100%;
+    height: 100%;
 }
 
 .button {
@@ -153,12 +152,20 @@ svg {
     text-align: center;
     display: inline-block;
     border-radius: 50%;
-  }
-
-
-.axis {
-    font: 10px sans-serif;
 }
+
+.multiselect {
+    transform: scale(0.8);
+}
+
+
+/* .axis { */
+
+
+/* font: 12px sans-serif; */
+
+
+/* } */
 
 .axis path,
 .axis line {
@@ -215,13 +222,15 @@ td {
     cursor: wait;
 }
 
+
 /* toggle button styling */
+
 .toggle.round,
-        .toggle-on.round,
-        .toggle-off.round {
-            border-radius: 20rem;
-        }
-        
-        .toggle.round .toggle-handle {
-            border-radius: 20rem;
-        }
+.toggle-on.round,
+.toggle-off.round {
+    border-radius: 20rem;
+}
+
+.toggle.round .toggle-handle {
+    border-radius: 20rem;
+}

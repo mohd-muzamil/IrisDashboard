@@ -1,3 +1,4 @@
+# Source: https://github.com/fpaulovich/dimensionality-reduction
 import math
 import numpy as np
 import os

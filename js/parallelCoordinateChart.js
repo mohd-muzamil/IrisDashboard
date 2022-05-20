@@ -1,5 +1,4 @@
-/****Importatnt file****/
-// This script is used to plot parallel cord charts in third and fourth svg
+// This script is used to generate visual representations over Feature comparison View.
 
 // d3V4 implementation of code similar to that by Mike Bostock
 // https://bl.ocks.org/mbostock/1341021
@@ -15,7 +14,7 @@ function parallelCord(chart, selectedId, lassoSelectedIds, featurelist) {
         type: "POST",
         contentType: 'application/json',
         data: JSON.stringify(postForm),
-        url: "/featureImportance",
+        url: "/getFeatureImportance",
         async: false,
         success: function(data) {
             featuresNames = Object.keys(data)
@@ -29,17 +28,18 @@ function parallelCord(chart, selectedId, lassoSelectedIds, featurelist) {
         xHigh = (width - margin.left - margin.right),
         yHigh = (height - margin.top - margin.bottom)
 
-    var titleText = "Feature comparison View"
+    var titleSVG = "Feature View"
+    var titleLegend = "Feature Importance"
+
     var deltaWidth = 0
-    if(featurelist.length>1)
-    {   
-        deltaWidth = (4 - featurelist.length)*xHigh / 4
+    if (featurelist.length > 1) {
+        deltaWidth = (4 - featurelist.length) * xHigh / 4
         xHigh = xHigh - deltaWidth
     }
 
     var featuresCodes = featuresNames
     const colorClusters = d3.scaleOrdinal().domain(["Setosa", "Versicolor", "Virginica"]).range(d3.schemeCategory10);
-    const featureImportanceScale = d3.scaleSequential(d3.interpolate("#5D3FD3", "#FFFFFF")).domain([1, 0])
+    const featureImportanceScale = d3.scaleSequential(d3.interpolate("#3f007d", "#FFFFFF")).domain([1, 0])
 
     var x = d3.scalePoint().domain(featuresCodes).range([margin.left, xHigh - margin.right]),
         y = {}
@@ -58,7 +58,7 @@ function parallelCord(chart, selectedId, lassoSelectedIds, featurelist) {
     dragging = {}
 
 
-    d3.csv("fetchAggFeatures")
+    d3.csv("getAggFeatures")
         .header("Content-Type", "application/json")
         .post(JSON.stringify(postForm),
             function(data) {
@@ -90,15 +90,15 @@ function parallelCord(chart, selectedId, lassoSelectedIds, featurelist) {
                     .attr("d", path)
                     .attr("stroke", d => colorClusters(d.variety))
 
-                // Add a title.
+                // Add a title to svg.
                 svg.append("text")
                     .attr("x", xHigh / 2)
-                    .attr("y", -margin.top+15)
+                    .attr("y", -margin.top + 15)
                     .style("fill", "rgb(18, 113, 249)")
                     .style("font-size", "15px")
                     .style("font-weight", "normal")
                     .style("text-anchor", "middle")
-                    .text(titleText)
+                    .text(titleSVG)
 
                 // sequential Color legend for feature importance.
                 var colorLegend = d3.legendColor()
@@ -107,26 +107,26 @@ function parallelCord(chart, selectedId, lassoSelectedIds, featurelist) {
                     .cells(11)
                     .shapePadding(-5)
                     .shapeWidth(16)
-                    .shapeHeight(yHigh/5)
+                    .shapeHeight(yHigh / 5)
 
                 svg.append("g")
                     .attr("class", "legend")
                     .attr("transform", `translate(${xHigh + deltaWidth/2}, ${0}) scale(${0.5})`)
                     .call(colorLegend)
                     .style("opacity", 1);
-                
+
+                //Add a title to legend
                 svg.append("text")
-                    .attr("x", xHigh)
-                    .attr("y", 0)
-                    .attr("id", "title")
-                    .attr("font-size", "10px")
-                    .attr("rotate", -90)
-                    .attr("dx", "1em")
-                    .attr("dy", "-1em")
-                    .attr("kerning", 0)
-                    .attr("letter-spacing", "0.5em")
-                    .attr("transform", "translate(150,0) rotate(90)")
-                    .text("Feature Importance");
+                    .attr("transform", `translate(${xHigh},${xHigh/50}) scale(${yHigh/235})`)
+                    .attr("font-size", "12px")
+                    .attr("text-anchor", "middle")
+                    .style("font-weight", "normal")
+                    .selectAll("tspan")
+                    .data(titleLegend.split(""))
+                    .enter().append("tspan")
+                    .attr("x", "-1em")
+                    .attr("dy", "0.8em")
+                    .text(function(d) { return d; });
 
                 // Add foreground lines.
                 foreground = svg.append("svg:g")
@@ -193,8 +193,8 @@ function parallelCord(chart, selectedId, lassoSelectedIds, featurelist) {
                     .each(function(d) { d3.select(this).append("rect"); })
                     .append("rect")
                     .attr("class", "boxes")
-                    .attr("width", 8)
-                    .attr("height", yHigh )
+                    .attr("width", 7)
+                    .attr("height", yHigh)
                     .attr("fill", function(d, i) {
                         return featureImportanceScale(importanceScores[i])
                     })

@@ -1,5 +1,4 @@
-/****Importatnt file****/
-// This script is used to render buffering icon while loading data
+// This script is generates a buffering icon rendering various charts.
 
 function buffering(chart, participantId, toggleText = true) {
     d3.select("#" + chart).selectAll('*').remove();
