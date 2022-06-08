@@ -1,5 +1,4 @@
 // This script is used to generate visual representations over Feature comparison View.
-
 // d3V4 implementation of code similar to that by Mike Bostock
 // https://bl.ocks.org/mbostock/1341021
 // https://gist.github.com/kotomiDu/d1fd0fe9397db41f5f8ce1bfb92ad20d
@@ -28,31 +27,8 @@ function parallelCord(chart, selectedId, lassoSelectedIds, featurelist) {
         xHigh = (width - margin.left - margin.right),
         yHigh = (height - margin.top - margin.bottom)
 
-    var titleSVG = "Feature View"
-    var titleLegend = "Feature Importance"
-
-    var deltaWidth = 0
-    if (featurelist.length > 1) {
-        deltaWidth = (4 - featurelist.length) * xHigh / 4
-        xHigh = xHigh - deltaWidth
-    }
-
-    var featuresCodes = featuresNames
-    const colorClusters = d3.scaleOrdinal().domain(["Setosa", "Versicolor", "Virginica"]).range(d3.schemeCategory10);
-    const featureImportanceScale = d3.scaleSequential(d3.interpolate("#3f007d", "#FFFFFF")).domain([1, 0])
-
-    var x = d3.scalePoint().domain(featuresCodes).range([margin.left, xHigh - margin.right]),
-        y = {}
-
-    var line = d3.line(),
-        background,
-        foreground;
-
-    const svg = d3.select("#" + chart)
-        .attr("width", margin.left + width + margin.right)
-        .attr("height", margin.top + height + margin.bottom)
-        .append("g")
-        .attr("transform", `translate(${margin.left + deltaWidth/2}, ${margin.top})`)
+    const titleSVG = "Feature View"
+    const titleLegend = "Feature Importance"
 
     postForm = { "id": selectedId }
     dragging = {}
@@ -70,6 +46,31 @@ function parallelCord(chart, selectedId, lassoSelectedIds, featurelist) {
                     })
                 }
 
+                var deltaWidth = 0
+                if (featurelist.length > 1) {
+                    deltaWidth = (4 - featurelist.length) * xHigh / 4
+                    xHigh = xHigh - deltaWidth
+                }
+
+                var featuresCodes = featuresNames
+                const colorClusters = d3.scaleOrdinal().domain(["Setosa", "Versicolor", "Virginica"]).range(d3.schemeCategory10);
+                const featureImportanceScale = d3.scaleSequential(d3.interpolate("#3f007d", "#FFFFFF")).domain([1, 0])
+
+                var x = d3.scalePoint().domain(featuresCodes).range([margin.left, xHigh - margin.right]),
+                    y = {}
+
+                var line = d3.line(),
+                    background,
+                    foreground;
+
+                d3.select("#" + chart).selectAll('*').remove();
+
+                const svg = d3.select("#" + chart)
+                    .attr("width", margin.left + width + margin.right)
+                    .attr("height", margin.top + height + margin.bottom)
+                    .append("g")
+                    .attr("transform", `translate(${margin.left + deltaWidth/2}, ${margin.top})`)
+
                 // Create a scale and brush for each trait.
                 featuresCodes.forEach(function(d) {
                     // Coerce values to numbers.
@@ -80,6 +81,7 @@ function parallelCord(chart, selectedId, lassoSelectedIds, featurelist) {
                         .domain([0, max])
                         .range([yHigh, 0]);
                 });
+
 
                 // Add gray background lines for context.
                 background = svg.append("svg:g")
@@ -117,7 +119,7 @@ function parallelCord(chart, selectedId, lassoSelectedIds, featurelist) {
 
                 //Add a title to legend
                 svg.append("text")
-                    .attr("transform", `translate(${xHigh},${xHigh/50}) scale(${yHigh/235})`)
+                    .attr("transform", `translate(${xHigh + deltaWidth/2},${yHigh/50}) scale(${yHigh/235})`)
                     .attr("font-size", "12px")
                     .attr("text-anchor", "middle")
                     .style("font-weight", "normal")
@@ -223,7 +225,7 @@ function parallelCord(chart, selectedId, lassoSelectedIds, featurelist) {
                         return d
                     }
                 });
-                d3.select("#" + chart).selectAll('.buffer').exit().remove();
+                d3.select("#" + chart).selectAll('.buffer').remove();
             });
 }
 
@@ -231,6 +233,6 @@ function updateParallelCord(chart, selectedId, lassoSelectedIds, featurelist) {
     if (Array.isArray(selectedId)) {
         selectedId = selectedId[0]
     }
-    d3.select("#" + chart).selectAll('*').remove(); //clearing the chart before plotting new data
+    buffering(chart, selectedId, toggleText = true)
     parallelCord(chart, selectedId, lassoSelectedIds, featurelist)
 }

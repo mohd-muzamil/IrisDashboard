@@ -1,18 +1,16 @@
 // This script is generates a buffering icon rendering various charts.
-
 function buffering(chart, participantId, toggleText = true) {
-    d3.select("#" + chart).selectAll('*').remove();
-    const margin = { left: 10, top: 10, right: 10, bottom: 10 },
+    const margin = { left: 25, top: 5, right: 25, bottom: 25 },
         width = $("#" + chart).width(),
         height = $("#" + chart).height()
-    const R = Math.round(Math.min(height, width) / 20)
+        xHigh = (width - margin.left - margin.right),
+        yHigh = (height - margin.top - margin.bottom)
+
+    const R = 15
     const dR = 0.2 * R
     const speed = 50
     const phi0 = 30
     const color = "RGB(26,97,247)"
-    const dx = width / 2;
-    var dy = height / 2
-    if (toggleText) { dy = 1 / 3 * height + R }
 
     var t0 = Date.now();
 
@@ -23,7 +21,7 @@ function buffering(chart, participantId, toggleText = true) {
 
     var container = svg.append('g')
         .attr("class", "buffer")
-        .attr('transform', `translate(${dx}, ${dy})`);
+        .attr("transform", `translate(${margin.left + xHigh/2}, ${margin.top + yHigh/2})`);
 
     function arc(innerRadius, outerRadius) {
         return d3.arc()
@@ -31,41 +29,42 @@ function buffering(chart, participantId, toggleText = true) {
             .innerRadius(innerRadius)
             .outerRadius(outerRadius)
             .startAngle(0)
-            .endAngle(0.85 * 2 * Math.PI);
+            .endAngle(0.75 * 2 * Math.PI);
     }
 
-    container.append("path")
-        .attr("class", "arc1")
-        .attr("d", arc(R, R + dR))
-        .attr("fill", color);
+    // container.append("path")
+    //     .attr("class", "arc1")
+    //     .attr("d", arc(R, R + dR))
+    //     .attr("fill", color);
 
     container.append("path")
-        .attr("class", "arc2")
+        .attr("class", "rotate")
         .attr("d", arc(0.666 * R, 0.666 * R + dR))
         .attr("fill", color)
-        .attr('transform', "rotate(90)");
+        .attr('transform', "rotate(0)");
 
     container.append("path")
-        .attr("class", "arc3")
+        .attr("class", "rotate1")
         .attr("d", arc(0.333 * R, 0.333 * R + dR))
         .attr("fill", color)
-        .attr('transform', "rotate(180)");
+        .attr('transform', "rotate(45)");
 
     if (toggleText) {
         container.append("text")
             .attr("dy", 3 * R + "px")
-            .text(`Loading data for ${ participantId }...`)
-            .style("font-size", 1.5 * R + "px")
+            .text(`Loading data for '${ participantId }'`)
+            .style("font-size", 0.75 * R + "px")
             .style("text-anchor", "middle");
     }
 
-    d3.timer(function() {
-        var delta = Date.now() - t0;
-        svg.selectAll('.arc1')
-            .attr('transform', 'rotate(' + (phi0 + delta * speed / 200) + ')');
-        svg.selectAll('.arc2')
-            .attr('transform', 'rotate(' + -(phi0 + delta * speed / 150) + ')');
-        svg.selectAll('.arc3')
-            .attr('transform', 'rotate(' + (phi0 + delta * speed / 100) + ')');
-    });
+    // rotating using css - this code not needed
+    // d3.timer(function() {
+    //     var delta = Date.now() - t0;
+    //     svg.selectAll('.buffer')
+    //         .attr('transform', 'rotate(' + (phi0 + delta * speed / 200) + ')');
+    //     svg.selectAll('.buffer')
+    //         .attr('transform', 'rotate(' + -(phi0 + delta * speed / 150) + ')');
+        // svg.selectAll('.arc3')
+            // .attr('transform', 'rotate(' + (phi0 + delta * speed / 100) + ')');
+    // });
 }
