@@ -534,6 +534,7 @@
                     contentType: 'application/json',
                     data: JSON.stringify(postForm),
                     url: "/dimReduceIds",
+                    async: false,
                     success: function(status) {
                         if (status === "status1:fileUpdated") {
                             // console.log("FeatureData file updated")
@@ -571,13 +572,15 @@
 
         function callGlyphs(){
             radius = +document.getElementById("myRange").value
-            updateGlyphs(chart1, chart2, selectedId, featurelist, radius, toggleGlyph, toggleDGrid, toggleLabels, toggleSvgGrid)
+            setTimeout(function() {
+                //your code to be executed after 1 second
+                updateGlyphs(chart1, chart2, selectedId, featurelist, radius, toggleGlyph, toggleDGrid, toggleLabels, toggleSvgGrid)
+            }, delayInMilliseconds)
         }
 
         function callParallelCord(){
             updateParallelCord(chart2, selectedId, [], featurelist)
         }
-
 
         {
             // help button alerts

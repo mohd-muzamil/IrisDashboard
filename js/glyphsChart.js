@@ -220,7 +220,7 @@ function glyphs(chart, dependendChart, selectedId, featurelist, radius, toggleGl
             labelYOffset = 4;
 
         // Scales for polygon glyph
-        const xpolygonLine = d3.lineRadial()
+        const xPolygonLine = d3.lineRadial()
         const polygonScale = d3.scaleLinear()
             .domain([0, 1])
             .range([0, config.r])
@@ -250,13 +250,17 @@ function glyphs(chart, dependendChart, selectedId, featurelist, radius, toggleGl
                         .enter()
                         .append("path")
                         .attr("class", d => { return legend === true ? null : (d.selectedId == selectedId ? "selectedGlyph" : null) })
-                        .attr("d", d => xPolygonLine([
-                            d["scaled_" + "sepal_length"],
-                            d["scaled_" + "sepal_width"],
-                            d["scaled_" + "petal_length"],
-                            d["scaled_" + "petal_width"],
-                            d["scaled_" + "sepal_length"],
-                        ].map((v, i) => [Math.PI * (i) / 2, polygonScale(v)])))
+                        .attr("d", d => {
+                            var newPolygonScale = polygonScale
+                            if (legend) newPolygonScale = polygonScaleConst
+                            return xPolygonLine([
+                                d["scaled_" + "sepal_length"],
+                                d["scaled_" + "sepal_width"],
+                                d["scaled_" + "petal_length"],
+                                d["scaled_" + "petal_width"],
+                                d["scaled_" + "sepal_length"],
+                            ].map((v, i) => [Math.PI * (i) / 2, newPolygonScale(v)]))
+                        })
                         .attr("transform", () => { return toggleDGrid == true ? `translate(${xScale(d.x_overlapRemoved)}, ${yScale(d.y_overlapRemoved)})` : `translate(${xScale(d.x)}, ${yScale(d.y)})` })
                         .attr("opacity", config.opacityHigh)
                         .attr("stroke", colorClusters(d["cluster"]))
