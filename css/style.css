@@ -2,8 +2,8 @@ body,
 html {
     height: 100%;
     /* background-image: */
-        /* linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), */
-        /* url("https://unsplash.com/photos/yI3weKNBRTc"); */
+    /* linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), */
+    /* url("https://unsplash.com/photos/yI3weKNBRTc"); */
     overflow: hidden;
 }
 
@@ -17,7 +17,7 @@ html {
     --code-bg-color: #aaaaaa;
     --code-font-size: 14px;
     --code-line-height: 1.4;
-    --scroll-bar-color: RGB(26,97,247);
+    --scroll-bar-color: RGB(26, 97, 247);
     --scroll-bar-bg-color: #f6f6f6;
 }
 
@@ -41,7 +41,9 @@ pre {
     scrollbar-color: var(--scroll-bar-color) var(--scroll-bar-bg-color);
 }
 
+
 /* Works on Chrome, Edge, and Safari */
+
 *::-webkit-scrollbar {
     width: 8px;
     height: 8px;
@@ -60,33 +62,32 @@ pre {
 .rotate {
     position: absolute;
     animation: rotation 1s infinite linear;
-  }
-  
-  @keyframes rotation {
+}
+
+@keyframes rotation {
     from {
-      transform: rotate(0deg);
+        transform: rotate(0deg);
     }
     to {
-      transform: rotate(359deg);
+        transform: rotate(359deg);
     }
-  }
-
+}
 
 .rotate1 {
     position: absolute;
     animation: rotation1 1s infinite;
-  }
-  
-  @keyframes rotation1 {
+}
+
+@keyframes rotation1 {
     from {
-      transform: rotate(0deg);
+        transform: rotate(0deg);
     }
     to {
-      transform: rotate(359deg);
+        transform: rotate(359deg);
     }
-  }
+}
 
-.glyphLegend1{
+.glyphLegend1 {
     rotate: -45;
 }
 
@@ -126,8 +127,8 @@ pre {
 svg {
     border: solid 1px #000;
     margin-top: 3px;
-	top: 0;
-	left: 0;
+    top: 0;
+    left: 0;
 }
 
 .svg1 {
@@ -154,6 +155,7 @@ svg {
     /* top: inherit !important; */
     /* left: inherit !important; */
 }
+
 
 /* number spinner for knn parameter skin 1 */
 
@@ -251,6 +253,7 @@ br {
 
 
 /* toggle button styling */
+
 .toggle.round,
 .toggle-on.round,
 .toggle-off.round {

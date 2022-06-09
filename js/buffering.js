@@ -3,7 +3,7 @@ function buffering(chart, participantId, toggleText = true) {
     const margin = { left: 25, top: 5, right: 25, bottom: 25 },
         width = $("#" + chart).width(),
         height = $("#" + chart).height()
-        xHigh = (width - margin.left - margin.right),
+    xHigh = (width - margin.left - margin.right),
         yHigh = (height - margin.top - margin.bottom)
 
     const R = 15
@@ -33,7 +33,7 @@ function buffering(chart, participantId, toggleText = true) {
     }
 
     // container.append("path")
-    //     .attr("class", "arc1")
+    //     .attr("class", "rotate1")
     //     .attr("d", arc(R, R + dR))
     //     .attr("fill", color);
 
@@ -64,7 +64,7 @@ function buffering(chart, participantId, toggleText = true) {
     //         .attr('transform', 'rotate(' + (phi0 + delta * speed / 200) + ')');
     //     svg.selectAll('.buffer')
     //         .attr('transform', 'rotate(' + -(phi0 + delta * speed / 150) + ')');
-        // svg.selectAll('.arc3')
-            // .attr('transform', 'rotate(' + (phi0 + delta * speed / 100) + ')');
+    // svg.selectAll('.arc3')
+    // .attr('transform', 'rotate(' + (phi0 + delta * speed / 100) + ')');
     // });
 }

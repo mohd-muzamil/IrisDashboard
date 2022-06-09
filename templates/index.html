@@ -41,8 +41,8 @@
             <!-- show is used here to hide or show the sidebar by default-->
             <div id="sidebar-nav" class="list-group border-0 rounded-0 text-sm-start min-vh-100">
                 <div class="card m-0 p-0 pb-1" style="display:flex; text-align: left;">
-                <img src="../img/iris.png" alt="Iris" style="display: block; margin-top:20px; margin-left:auto; margin-right: auto; width: 30%;">
-                <h6 id="dashboardHeader" style="margin:0; padding: 0; text-align:center; color:rgb(18, 113, 249)">Iris Dataset</h6>
+                    <img src="../img/iris.png" alt="Iris" style="display: block; margin-top:20px; margin-left:auto; margin-right: auto; width: 30%;">
+                    <h6 id="dashboardHeader" style="margin:0; padding: 0; text-align:center; color:rgb(18, 113, 249)">Iris Dataset</h6>
                 </div>
                 <hr class="double">
                 <div class="card m-0 p-0 py-2" style="display:flex; text-align: left;">
@@ -61,8 +61,7 @@
                             </div>
                         </div>
                         <div class="input-group input-group-sm m-0 p-0 scaled" style="width: 13em; left: -2em;">
-                            <input type="text" id="searchSelector" class="form-control" aria-label="Search"
-                                stlye="text-align: center;" />
+                            <input type="text" id="searchSelector" class="form-control" aria-label="Search" stlye="text-align: center;" />
                         </div>
                     </div>
                     <br>
@@ -210,8 +209,7 @@
                             <div>
                                 <span class="p-0" onclick=alertReset()><i
                                         class="fa-solid fa-circle-question help"></i></span>
-                                <input type="button" class="btn btn-info btn-sm ml-1" style="width:60%; height:20%"
-                                    id="btn-reload" value="Reset" />
+                                <input type="button" class="btn btn-info btn-sm ml-1" style="width:60%; height:20%" id="btn-reload" value="Reset" />
                             </div>
                         </div>
                     </div>
@@ -275,7 +273,7 @@
                 ids.forEach(e => {
                     ids_str.push(e.toString())
                 });
-                
+
                 selectedId = ids[Math.floor(Math.random() * ids.length)]
                 $("#searchSelector").autocomplete({
                     source: ids_str
@@ -377,7 +375,7 @@
             }
 
             // jquery handlers for showing chart for random data on screen
-            {   
+            {
                 processDimRedux()
                 callGlyphs()
                 callParallelCord()
@@ -405,17 +403,17 @@
             })
 
             // refresh after the side open or close using menu click event
-        $("#menu").on('click', function () {
+            $("#menu").on('click', function() {
                 $("#wrapper").toggleClass("no-sidebar")
                 setTimeout(() => {
-                callGlyphs();
-                callParallelCord();
-                callRadialTime();
-             }, delayInMilliseconds);
+                    callGlyphs();
+                    callParallelCord();
+                    callRadialTime();
+                }, delayInMilliseconds);
             });
 
-        // uncomment below line to hide the sidebar after submit button
-        // $("#sidebar").removeClass("show")
+            // uncomment below line to hide the sidebar after submit button
+            // $("#sidebar").removeClass("show")
 
         }
 
@@ -506,8 +504,8 @@
                 selectedId = d3.select("#" + chart1).select(".selectedGlyph").datum().id;
                 processDimRedux()
                 callGlyphs()
-                // mango
-                // callParallelCord()
+                    // mango
+                    // callParallelCord()
             })
         }
 
@@ -569,12 +567,12 @@
             }
         }
 
-        function callGlyphs(){
+        function callGlyphs() {
             radius = +document.getElementById("myRange").value
             updateGlyphs(chart1, chart2, selectedId, featurelist, radius, toggleGlyph, toggleDGrid, toggleLabels, toggleSvgGrid)
         }
 
-        function callParallelCord(){
+        function callParallelCord() {
             updateParallelCord(chart2, selectedId, [], featurelist)
         }
 
