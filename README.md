@@ -5,3 +5,5 @@
   <li>The menu also has a search bar that allows users to search and select a specific using their ID quickly.
   <li>Users can also vary the k-parameter to the K Nearest Neighbours (KNN) algorithm. The cluster value derived using KNN is used to add a stroke colour over the glyph.
   <li>The menu also allows users to choose between t-SNE and PCA dimensionality algorithms. The glyphs' positions over Glyphs View are based on this DR algorithm.
+
+    https://youtu.be/xHMLt8pg9e8
