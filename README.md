@@ -1,4 +1,4 @@
-##Explorative dashboard to analyze multidimensional data visually.
+#Explorative dashboard to analyze multidimensional data visually.
 Two views, i.e. Glyph View and Feature View, allow the user to interact with the dataset and select a specific data point which can then be compared with the remainder of the data points or lasso selected data points.
 The menu in the sidebar allows the user to choose a few options like Glyph type and size of the glyph, hide/show the glyph labels, and hide/show the grid to show its 2D projections.
 The menu also has a search bar that allows users to search and select a specific using their ID quickly.
