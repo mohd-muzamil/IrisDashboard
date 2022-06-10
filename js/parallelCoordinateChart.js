@@ -27,7 +27,7 @@ function parallelCord(chart, selectedId, lassoSelectedIds, featurelist) {
         xHigh = (width - margin.left - margin.right),
         yHigh = (height - margin.top - margin.bottom)
 
-    const titleSVG = "Feature View"
+    const titleSVG = `Feature View (id:${selectedId})`
     const titleLegend = "Feature Importance"
 
     postForm = { "id": selectedId }
