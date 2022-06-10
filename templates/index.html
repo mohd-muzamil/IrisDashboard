@@ -111,7 +111,7 @@
                         <label class="pl-2" style="font-size: 13px; font-weight:500; "> K param for KNN</label>
                         <div class="row m-0 p-0">
                             <div class="col-10 num-block skin-1 m-0 p-0 pl-2">
-                                <div class="num-in">
+                                <div class="num-in" id="knnSpinner">
                                     <span class="minus"></span>
                                     <input style="font-weight:bold; font-size: 13px" type="text" class="in-num" value="3">
                                     <span class="plus"></span>
@@ -233,6 +233,17 @@
     </div>
     <!-- wrapper end -->
 
+    <script>
+        // setting up the default states for toggle swtiches
+        {
+            $('#toggleDimRedux').bootstrapToggle('on') //on-tsne off-pca
+            $('#toggleGlyph').bootstrapToggle('on') //on-flower off-polygon
+            $('#toggleDGrid').bootstrapToggle('on') //on-overlapRemove off-keepOverlap
+            $('#toggleLabels').bootstrapToggle('off') //on-showLabels off-hideLabels
+            $('#toggleSvgGrid').bootstrapToggle('on') //on-keepGrid off-hideGrid
+        }
+    </script>
+
     <!-- Imports -->
     <script src="https://d3js.org/d3.v4.min.js"></script>
     <script src="https:/d3js.org/d3-scale-chromatic.v0.3.min.js"></script>
@@ -282,15 +293,6 @@
             }
         })
 
-        // setting up the default states for toggle swtiches
-        {
-            $('#toggleDimRedux').bootstrapToggle('on') //on-tsne off-pca
-            $('#toggleGlyph').bootstrapToggle('on') //on-flower off-polygon
-            $('#toggleDGrid').bootstrapToggle('on') //on-overlapRemove off-keepOverlap
-            $('#toggleLabels').bootstrapToggle('off') //on-showLabels off-hideLabels
-            $('#toggleSvgGrid').bootstrapToggle('on') //on-keepGrid off-hideGrid
-        }
-
         // jquery handlers for initially setting the values of variables
         {
             $('#searchSelector').change(function() {
@@ -314,9 +316,9 @@
             }
 
             if ($("#toggleDimRedux").is(':checked')) {
-                toggleDimRedux = "pca"
-            } else {
                 toggleDimRedux = "tsne"
+            } else {
+                toggleDimRedux = "pca"
             }
 
             if ($("#toggleDGrid").is(':checked')) {
@@ -337,7 +339,7 @@
                 toggleSvgGrid = false
             }
 
-            k = $('.num-in span').parents('.num-block').find('input.in-num').val()
+            k = $('#knnSpinner span').parents('.num-block').find('input.in-num').val()
 
             // jquery handlers for knn input spinner
             {
@@ -345,8 +347,8 @@
                 $(document).ready(function() {
                     const min = 1
                     const max = ids.length
-                    $('.num-in span').click(function() {
-                        count = $('.num-in span').parents('.num-block').find('input.in-num').val()
+                    $('#knnSpinner span').click(function() {
+                        count = $('#knnSpinner span').parents('.num-block').find('input.in-num').val()
                         var $input = $(this).parents('.num-block').find('input.in-num')
                         if ($(this).hasClass('plus')) count++
                             else count--
@@ -356,19 +358,21 @@
                     })
 
                     // auto update the button for k param when input goes above the range
-                    $('.num-in span').parents('.num-block').find('input.in-num').on("change", () => {
-                        count = $('.num-in span').parents('.num-block').find('input.in-num').val()
-                        if (count <= min) {
+                    $('#knnSpinner span').parents('.num-block').find('input.in-num').on("change", () => {
+                        count = $('#knnSpinner span').parents('.num-block').find('input.in-num').val()
+                        if (isNaN(count)) {
+                            count = 3
+                        } else if (count <= min) {
                             count = min
-                            $('.num-in span').parents('.num-block').find(('.minus')).addClass('dis')
+                            $('#knnSpinner span').parents('.num-block').find(('.minus')).addClass('dis')
                         } else if (count >= max) {
                             count = max
-                            $('.num-in span').parents('.num-block').find(('.plus')).addClass('dis')
+                            $('#knnSpinner span').parents('.num-block').find(('.plus')).addClass('dis')
                         } else {
-                            $('.num-in span').parents('.num-block').find(('.minus')).removeClass('dis')
-                            $('.num-in span').parents('.num-block').find(('.plus')).removeClass('dis')
+                            $('#knnSpinner span').parents('.num-block').find(('.minus')).removeClass('dis')
+                            $('#knnSpinner span').parents('.num-block').find(('.plus')).removeClass('dis')
                         }
-                        $('.num-in span').parents('.num-block').find('input.in-num').val(count)
+                        $('#knnSpinner span').parents('.num-block').find('input.in-num').val(count)
                         k = count
                     })
                 })
@@ -532,6 +536,7 @@
                     contentType: 'application/json',
                     data: JSON.stringify(postForm),
                     url: "/dimReduceIds",
+                    async: false,
                     success: function(status) {
                         if (status === "status1:fileUpdated") {
                             // console.log("FeatureData file updated")
@@ -569,13 +574,15 @@
 
         function callGlyphs() {
             radius = +document.getElementById("myRange").value
-            updateGlyphs(chart1, chart2, selectedId, featurelist, radius, toggleGlyph, toggleDGrid, toggleLabels, toggleSvgGrid)
+            setTimeout(function() {
+                //your code to be executed after 1 second
+                updateGlyphs(chart1, chart2, selectedId, featurelist, radius, toggleGlyph, toggleDGrid, toggleLabels, toggleSvgGrid)
+            }, delayInMilliseconds)
         }
 
         function callParallelCord() {
             updateParallelCord(chart2, selectedId, [], featurelist)
         }
-
 
         {
             // help button alerts

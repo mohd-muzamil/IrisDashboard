@@ -1,19 +1,20 @@
 // This script is used to generate visual representations over Glyph View.
 function glyphs(chart, dependendChart, selectedId, featurelist, radius, toggleGlyph, toggleDGrid, toggleLabels, toggleSvgGrid) {
-    delta = radius / 100
     const config = {
         r: +radius,
         glyphLegendR: 50,
         opacityLow: 0,
         opacityHigh: 1,
-        opacityClickLow: 0.35,
-        opacityClickMid: 0.6,
-        opacityClickHigh: 0.7,
-        strokeWidthLow: 0.5 - delta,
-        strokeWidthHigh: 2 - delta,
+        opacityClickLow: 0.2,
+        opacityClickMid: 0.3,
+        opacityClickHigh: 0.5,
+        strokeWidthLow: 0,
+        strokeWidthMid: 0.4,
+        strokeWidthHigh: 1.5,
         fillColor: "transparent",
-        fillColorLasso: "#636363",
-        petals: 4, //no of petals in the glyph
+        fillColorLasso: "#000000",
+        strokeLasso: "red",
+        petals: featurelist.length, //no of petals in the glyph
         labelSize: radius / 2, //size of labels to show over the glyphs
         toggleBrushOrLasso: "lasso",
         grid_size: 3,
@@ -21,7 +22,10 @@ function glyphs(chart, dependendChart, selectedId, featurelist, radius, toggleGl
         max_zoom: 4,
     }
 
-    if (toggleSvgGrid) { config.opacityLow = 0.2 }
+    if (toggleSvgGrid) {
+        config.opacityLow = 0.4
+        config.strokeWidthLow = 0.1
+    }
     const customPath = "M 0 0 C 20 -60, 20 -100, 0 -100 C -20 -100, -20 -60, 0 0" // flower petals
     var flowers = ["Setosa", "Versicolor", "Virginica"]
     const colorClusters = d3.scaleOrdinal().domain(flowers).range(d3.schemeCategory10)
@@ -40,7 +44,7 @@ function glyphs(chart, dependendChart, selectedId, featurelist, radius, toggleGl
             d.y = +d.y
             d.id = +d.id
         })
-        const margin = { left: 5, top: 5, right: config.glyphLegendR * 2 + config.r, bottom: 5 },
+        const margin = { left: 5, top: 15, right: config.glyphLegendR * 2 + 5, bottom: 5 },
             width = $("#" + chart).width(),
             height = $("#" + chart).height()
 
@@ -87,10 +91,11 @@ function glyphs(chart, dependendChart, selectedId, featurelist, radius, toggleGl
             .attr("x2", d => { return d })
             .attr("y2", height)
             .style("opacity", (d, i) => {
-                return i % Math.ceil(100 / config.grid_size) == 0 ? config.opacityLow * 1.25 : config.opacityLow * 0.6
+                return i % Math.ceil(100 / config.grid_size) == 0 ? config.opacityLow * 1.25 : config.opacityLow * 0.5
             })
             .style("stroke", "black")
-            .style("stroke-width", (d, i) => { return i % Math.ceil(100 / config.grid_size) == 0 ? config.strokeWidthLow * 1.5 : config.strokeWidthLow })
+            .style("stroke-width", 0.4)
+            .lower()
 
         svgGrid.append("g").attr("class", "horizontal")
             .selectAll("line")
@@ -101,10 +106,11 @@ function glyphs(chart, dependendChart, selectedId, featurelist, radius, toggleGl
             .attr("x2", width)
             .attr("y2", d => { return d })
             .style("opacity", (d, i) => {
-                return i % Math.ceil(100 / config.grid_size) == 0 ? config.opacityLow * 1.25 : config.opacityLow * 0.6
+                return i % Math.ceil(100 / config.grid_size) == 0 ? config.opacityLow * 1.25 : config.opacityLow * 0.5
             })
             .style("stroke", "black")
-            .style("stroke-width", (d, i) => { return i % Math.ceil(100 / config.grid_size) == 0 ? config.strokeWidthLow * 1.5 : config.strokeWidthLow })
+            .style("stroke-width", 0.4)
+            .lower()
 
         // Legends
         var legendOrdinal = d3.legendColor()
@@ -119,31 +125,28 @@ function glyphs(chart, dependendChart, selectedId, featurelist, radius, toggleGl
             .on("cellclick", function(e) {
                 d3.selectAll(".hovercircle")
                     .classed("selectedLasso", false)
-                    .attr("opacity", d => { return (d.id == selectedId | d.variety != d.cluster) ? config.opacityHigh : config.opacityLow })
+                    .attr("opacity", config.opacityHigh)
                     .attr("stroke", "black")
-                    .attr("stroke-width", d => { return d.id == selectedId ? config.strokeWidthHigh : config.strokeWidthLow })
                     .style("fill", config.fillColor)
 
                 d3.selectAll(".hovercircle")
                     .filter(d => { return d["variety"] == e })
                     .classed("selectedLasso", true)
-                    .attr("opacity", d => { return d.id == selectedId ? config.opacityClickHigh : d.variety != d.cluster ? config.opacityClickMid : config.opacityClickLow })
-                    .attr("stroke", "black")
-                    .attr("stroke-width", d => {
-                        return (d.id == selectedId) ? config.strokeWidthHigh : config.strokeWidthLow
+                    .attr("opacity", d => {
+                        return (d.id == selectedId) ? config.opacityClickHigh : (d["variety"] != d["cluster"]) ? config.opacityClickMid : config.opacityClickLow
                     })
-                    .style("fill", d => {
-                        return (d.id == selectedId) ? config.fillColorLasso : config.fillColorLasso
-                    })
-                plotParallelCord()
+                    .attr("stroke", config.strokeLasso)
+                    .style("fill", config.fillColorLasso)
+                callParallelCord()
             })
             .on("cellout", () => {
                 svg.style("cursor", "move")
             })
 
+        let dwidth = 80
         svg.append("g")
             .attr("class", "legendOrdinal")
-            .attr("transform", `translate(${width - 65}, ${5}) scale(${1/2})`)
+            .attr("transform", `translate(${width - dwidth}, ${10}) scale(${1/2})`)
             .call(legendOrdinal)
             .style("opacity", config.opacityHigh)
 
@@ -220,7 +223,7 @@ function glyphs(chart, dependendChart, selectedId, featurelist, radius, toggleGl
             labelYOffset = 4;
 
         // Scales for polygon glyph
-        const xpolygonLine = d3.lineRadial()
+        const xPolygonLine = d3.lineRadial()
         const polygonScale = d3.scaleLinear()
             .domain([0, 1])
             .range([0, config.r])
@@ -250,17 +253,21 @@ function glyphs(chart, dependendChart, selectedId, featurelist, radius, toggleGl
                         .enter()
                         .append("path")
                         .attr("class", d => { return legend === true ? null : (d.selectedId == selectedId ? "selectedGlyph" : null) })
-                        .attr("d", d => xPolygonLine([
-                            d["scaled_" + "sepal_length"],
-                            d["scaled_" + "sepal_width"],
-                            d["scaled_" + "petal_length"],
-                            d["scaled_" + "petal_width"],
-                            d["scaled_" + "sepal_length"],
-                        ].map((v, i) => [Math.PI * (i) / 2, polygonScale(v)])))
+                        .attr("d", d => {
+                            var newPolygonScale = polygonScale
+                            if (legend) newPolygonScale = polygonScaleConst
+                            return xPolygonLine([
+                                d["scaled_" + "sepal_length"],
+                                d["scaled_" + "sepal_width"],
+                                d["scaled_" + "petal_length"],
+                                d["scaled_" + "petal_width"],
+                                d["scaled_" + "sepal_length"],
+                            ].map((v, i) => [Math.PI * (i) / 2, newPolygonScale(v)]))
+                        })
                         .attr("transform", () => { return toggleDGrid == true ? `translate(${xScale(d.x_overlapRemoved)}, ${yScale(d.y_overlapRemoved)})` : `translate(${xScale(d.x)}, ${yScale(d.y)})` })
                         .attr("opacity", config.opacityHigh)
                         .attr("stroke", colorClusters(d["cluster"]))
-                        .attr("stroke-width", config.strokeWidthHigh * 1)
+                        .attr("stroke-width", config.strokeWidthHigh)
                         .attr("fill", colorClusters(d["variety"]))
                 })
 
@@ -299,7 +306,7 @@ function glyphs(chart, dependendChart, selectedId, featurelist, radius, toggleGl
                         })
                         .attr("opacity", config.opacityHigh)
                         .attr("stroke", colorClusters(d["cluster"]))
-                        .attr("stroke-width", config.strokeWidthHigh * 5)
+                        .attr("stroke-width", config.strokeWidthHigh * 4)
                         .attr("fill", colorClusters(d["variety"]));
                 })
 
@@ -343,7 +350,7 @@ function glyphs(chart, dependendChart, selectedId, featurelist, radius, toggleGl
                 .attr("r", config.glyphLegendR)
                 .attr("opacity", 1 / 2)
                 .attr("stroke", "black")
-                .attr("stroke-width", 1 / 5)
+                .attr("stroke-width", config.strokeWidthMid)
                 .style("fill", config.fillColor)
 
             svgGlyphLegend.select("line")
@@ -356,7 +363,7 @@ function glyphs(chart, dependendChart, selectedId, featurelist, radius, toggleGl
                 .attr("y2", dy)
                 .attr("opacity", 1 / 2)
                 .attr("stroke", "black")
-                .attr("stroke-width", 1 / 5)
+                .attr("stroke-width", config.strokeWidthMid)
                 .lower();
 
 
@@ -366,6 +373,7 @@ function glyphs(chart, dependendChart, selectedId, featurelist, radius, toggleGl
                 .enter()
                 .append('text')
                 .attr('text-anchor', 'middle')
+                .attr("opacity", 0.5)
                 .style('font-size', '10px')
                 .style('font-weight', 'lighter')
                 .style("cursor", "default")
@@ -377,11 +385,11 @@ function glyphs(chart, dependendChart, selectedId, featurelist, radius, toggleGl
                 })
                 .text(function(d) {
                     // return featurelist[d]
-                    return "||||"
+                    return "**"
                 })
                 .attr("opacity", 0.2)
                 .on("mousemove", () => {
-                    tooltip_mousemove()
+                    tooltip_mousemove(dx = -60)
                 })
                 .on("mouseover", d => {
                     tooltip_mouseover((featurelist[d]))
@@ -409,18 +417,23 @@ function glyphs(chart, dependendChart, selectedId, featurelist, radius, toggleGl
                 .attr("cy", d => { return toggleDGrid == true ? yScale(d.y_overlapRemoved) : yScale(d.y) })
                 .attr("r", config.r)
                 .classed("selectedGlyph", d => { return d.id == Id ? true : false })
-                .attr("opacity", d => { return (d.id == Id | d.variety != d.cluster) ? config.opacityHigh : config.opacityLow })
+                .attr("opacity", config.opacityHigh)
                 .attr("stroke", "black")
-                .attr("stroke-width", d => {
-                    return d.id == selectedId ? config.strokeWidthHigh : config.strokeWidthLow
-                })
+                .attr("stroke-width", d => { return d.id == selectedId ? config.strokeWidthHigh : d["variety"] != d["cluster"] ? config.strokeWidthMid : config.strokeWidthLow })
                 .style("fill", config.fillColor)
                 .on("mousemove", () => {
                     tooltip_mousemove()
                 })
                 .on("mouseover", d => {
                     // tooltip_mousemove()
-                    tooltip_mouseover((`id:${d.id} SL:${d["sepal_length"]} SW:${d["sepal_width"]} PL:${d["petal_length"]} PW:${d["petal_width"]}`))
+                    tooltip_text = ""
+                    featurelist.forEach(e => {
+                        if (e == "sepal_length") tooltip_text += " " + `SL:${ d["sepal_length"] }`
+                        if (e == "sepal_width") tooltip_text += " " + `SW:${ d["sepal_width"] }`
+                        if (e == "petal_length") tooltip_text += " " + `PL:${ d["petal_length"] }`
+                        if (e == "petal_width") tooltip_text += " " + `PW:${ d["petal_width"] }`
+                    })
+                    tooltip_mouseover((`id:${d.id} ${ tooltip_text }`))
                 })
                 .on("mouseout", () => {
                     tooltip_mouseout()
@@ -454,7 +467,7 @@ function glyphs(chart, dependendChart, selectedId, featurelist, radius, toggleGl
                             .attr("opacity", config.opacityClickHigh)
                             .attr("stroke-width", config.strokeWidthHigh)
                             .style("fill", config.fillColorLasso)
-                        plotParallelCord()
+                        callParallelCord()
                     }
                     // case3: pre-selected not lasso-selected
                     else if (classCurrentSelection.includes("hovercircle") & classCurrentSelection.includes("selectedGlyph")) {
@@ -486,10 +499,10 @@ function glyphs(chart, dependendChart, selectedId, featurelist, radius, toggleGl
                             .attr("opacity", config.opacityHigh)
                             .attr("stroke-width", config.strokeWidthHigh)
                             .style("fill", config.fillColor)
+                        callParallelCord()
                     }
 
                     addGlyphLegend(d)
-                    plotParallelCord()
                 })
         }
 
@@ -502,18 +515,13 @@ function glyphs(chart, dependendChart, selectedId, featurelist, radius, toggleGl
             var lassoEnd = function() {
                 lasso.selectedItems() // lasso.notSelectedItems()
                     .classed("selectedLasso", true)
-                    .style("fill", (d) => {
-                        return (d.id == selectedId) ? config.fillColorLasso : config.fillColorLasso
-                    })
                     .attr("opacity", (d) => {
-                        return (d.id == selectedId) ? config.opacityClickHigh : d.variety != d.cluster ? config.opacityClickMid : config.opacityClickLow
+                        return (d.id == selectedId) ? config.opacityClickHigh : d["variety"] != d["cluster"] ? config.opacityClickMid : config.opacityClickLow
                     })
-                    .attr("stroke", "black")
-                    .attr("stroke-width", (d) => {
-                        return (d.id == selectedId) ? config.strokeWidthHigh : config.strokeWidthHigh / 3
-                    })
+                    .attr("stroke", config.strokeLasso)
+                    .style("fill", config.fillColorLasso)
                 if (!d3.event.shiftKey) { svg.style("cursor", "move") }
-                plotParallelCord()
+                callParallelCord()
             }
 
             circles = svgGlyphs.selectAll(".hovercircle")
@@ -522,7 +530,6 @@ function glyphs(chart, dependendChart, selectedId, featurelist, radius, toggleGl
                 .closePathDistance(100)
                 .items(circles)
                 .targetArea(svgGlyphs)
-                // .on("start",lasso_start)
                 .on("draw", lasso_draw)
                 .on("end", lassoEnd)
 
@@ -573,7 +580,7 @@ function glyphs(chart, dependendChart, selectedId, featurelist, radius, toggleGl
             .attr("fill", "transparent")
             .attr("rx", 3)
             .on("mousemove", () => {
-                tooltip_mousemove(dx = -50, dy = 0)
+                tooltip_mousemove(dx = -20, dy = 0)
             })
             .on("mouseover", d => {
                 tooltip_mouseover("Help")
@@ -583,7 +590,8 @@ function glyphs(chart, dependendChart, selectedId, featurelist, radius, toggleGl
             })
             .on("click", function() {
                 alert(
-                    'Glyph View shows all the data points in the form of either a Flower glyph or a Polygon glyph.\n' +
+                    'Glyph View shows all the data points in the form of either a flower glyph or a polygon glyph.\n' +
+                    'fill color of each glyph represents its true class whereas stroke color each Gglyph represents the class predicted using KNN classifier.\n' +
                     'Feature View shows all the data points in the form of parallel coordinate lines. The data point selected in the Glyph View is highlighted with a bold black line to show its relevance compared to the rest of the data points or lasso selected data points.'
                 )
             })
@@ -609,7 +617,7 @@ function glyphs(chart, dependendChart, selectedId, featurelist, radius, toggleGl
             .attr("opacity", config.opacityClickHigh)
             .attr("rx", 3)
             .on("mousemove", () => {
-                tooltip_mousemove(dx = -70, dy = 0)
+                tooltip_mousemove(dx = -40, dy = 0)
             })
             .on("mouseover", d => {
                 tooltip_mouseover("ClearAll")
@@ -626,7 +634,7 @@ function glyphs(chart, dependendChart, selectedId, featurelist, radius, toggleGl
                     .attr("stroke", "black")
                     .attr("stroke-width", d => { return d.id == selectedId ? config.strokeWidthHigh : config.strokeWidthLow })
                     .style("fill", d => { return d.id == selectedId ? config.fillColor : config.fillColor })
-                plotParallelCord()
+                callParallelCord()
             })
 
         // recenter button
@@ -649,7 +657,7 @@ function glyphs(chart, dependendChart, selectedId, featurelist, radius, toggleGl
             .attr("fill", "transparent")
             .attr("rx", 3)
             .on("mousemove", () => {
-                tooltip_mousemove(dx = -80, dy = 0)
+                tooltip_mousemove(dx = -50, dy = 0)
             })
             .on("mouseover", d => {
                 tooltip_mouseover("Recenter")
@@ -688,7 +696,7 @@ function glyphs(chart, dependendChart, selectedId, featurelist, radius, toggleGl
             .attr("fill", "transparent")
             .attr("rx", 3)
             .on("mousemove", () => {
-                tooltip_mousemove(dx = -70, dy = 0)
+                tooltip_mousemove(dx = -40, dy = 0)
             })
             .on("mouseover", d => {
                 tooltip_mouseover("ZoomIn")
@@ -739,7 +747,7 @@ function glyphs(chart, dependendChart, selectedId, featurelist, radius, toggleGl
             .attr("fill", "transparent")
             .attr("rx", 3)
             .on("mousemove", () => {
-                tooltip_mousemove(dx = -80, dy = 0)
+                tooltip_mousemove(dx = -50, dy = 0)
             })
             .on("mouseover", d => {
                 tooltip_mouseover("ZoomOut")
@@ -766,7 +774,7 @@ function glyphs(chart, dependendChart, selectedId, featurelist, radius, toggleGl
                 }
             })
 
-        function plotParallelCord() {
+        function callParallelCord() {
             lassoSelectedIds = [selectedId]
             d3.selectAll(".selectedLasso")["_groups"][0].forEach(function(d) {
                 if (!lassoSelectedIds.includes(d.__data__.id)) { lassoSelectedIds.push(d.__data__.id) }
