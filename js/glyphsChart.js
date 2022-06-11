@@ -44,7 +44,7 @@ function glyphs(chart, dependendChart, selectedId, featurelist, radius, toggleGl
             d.y = +d.y
             d.id = +d.id
         })
-        const margin = { left: 5, top: 15, right: config.glyphLegendR * 2 + 5, bottom: 5 },
+        const margin = { left: 5, top: 15, right: config.glyphLegendR * 2 + 15, bottom: 5 },
             width = $("#" + chart).width(),
             height = $("#" + chart).height()
 
@@ -323,7 +323,7 @@ function glyphs(chart, dependendChart, selectedId, featurelist, radius, toggleGl
                 .attr("x", d => { return toggleDGrid == true ? xScale(d.x_overlapRemoved) : xScale(d.x) })
                 .attr("y", d => { return toggleDGrid == true ? yScale(d.y_overlapRemoved) : yScale(d.y) })
                 .attr("dx", (-0.8 * config.r / 2) + "px")
-                .attr("dy", (config.r) + "px")
+                .attr("dy", (1.1*config.r) + "px")
                 .attr("font-size", config.labelSize.toString() + "px")
                 .attr("opacity", 0.8)
                 .text(d => { return d.id })
@@ -348,7 +348,7 @@ function glyphs(chart, dependendChart, selectedId, featurelist, radius, toggleGl
                 .attr("cx", dx)
                 .attr("cy", dy)
                 .attr("r", config.glyphLegendR)
-                .attr("opacity", 1 / 2)
+                .attr("opacity", 1)
                 .attr("stroke", "black")
                 .attr("stroke-width", config.strokeWidthMid)
                 .style("fill", config.fillColor)
@@ -361,7 +361,7 @@ function glyphs(chart, dependendChart, selectedId, featurelist, radius, toggleGl
                 .attr("x2", dx)
                 .attr("y1", d => { return dy - config.glyphLegendR * Math.cos(glyphLegendScale(d) * radians) })
                 .attr("y2", dy)
-                .attr("opacity", 1 / 2)
+                .attr("opacity", 1)
                 .attr("stroke", "black")
                 .attr("stroke-width", config.strokeWidthMid)
                 .lower();
