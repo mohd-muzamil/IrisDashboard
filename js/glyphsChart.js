@@ -256,13 +256,12 @@ function glyphs(chart, dependendChart, selectedId, featurelist, radius, toggleGl
                         .attr("d", d => {
                             var newPolygonScale = polygonScale
                             if (legend) newPolygonScale = polygonScaleConst
-                            return xPolygonLine([
-                                d["scaled_" + "sepal_length"],
-                                d["scaled_" + "sepal_width"],
-                                d["scaled_" + "petal_length"],
-                                d["scaled_" + "petal_width"],
-                                d["scaled_" + "sepal_length"],
-                            ].map((v, i) => [Math.PI * (i) / 2, newPolygonScale(v)]))
+                            var tPolygon = []
+                            featurelist.forEach(e=>{
+                                tPolygon.push(d["scaled_" + e])
+                            })
+                            tPolygon.push(d["scaled_" + featurelist[0]])
+                            return xPolygonLine(tPolygon.map((v, i) => [i* 2*Math.PI / config.petals, newPolygonScale(v)]))
                         })
                         .attr("transform", () => { return toggleDGrid == true ? `translate(${xScale(d.x_overlapRemoved)}, ${yScale(d.y_overlapRemoved)})` : `translate(${xScale(d.x)}, ${yScale(d.y)})` })
                         .attr("opacity", config.opacityHigh)
@@ -284,11 +283,10 @@ function glyphs(chart, dependendChart, selectedId, featurelist, radius, toggleGl
                 .append('g')
                 .attr("class", d => { return legend === true ? null : (d.selectedId == selectedId ? "selectedGlyph" : null) })
                 .each(function(d) {
-                    const tPetals = [d["scaled_" + "sepal_length"],
-                        d["scaled_" + "sepal_width"],
-                        d["scaled_" + "petal_length"],
-                        d["scaled_" + "petal_width"],
-                    ]
+                    var tPetals = []
+                    featurelist.forEach(e=>{
+                        tPetals.push(d["scaled_" + e])
+                    })
                     d3.select(this)
                         .selectAll("path")
                         .data(tPetals)
@@ -397,6 +395,17 @@ function glyphs(chart, dependendChart, selectedId, featurelist, radius, toggleGl
                 .on("mouseout", () => {
                     tooltip_mouseout()
                 });
+
+            svgGlyphLegend.select("text")
+                .data([0])
+                .enter()
+                .append('text')
+                .attr('text-anchor', 'middle')
+                .style('font-size', '15px')
+                .style('font-weight', 'normal')
+                .style("fill", "rgb(18, 113, 249)")
+                .attr("transform", `translate(${dx}, ${(dy + 1.5*config.glyphLegendR)})`)
+                .text(`id: ${selectedId}`)
 
             if (toggleGlyph == "polygonGlyph") {
                 plotPolygonGlyph(features = [glyphLegend], legend = true)
