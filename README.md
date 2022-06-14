@@ -7,8 +7,8 @@
   <li>The menu also allows users to choose between t-SNE and PCA dimensionality algorithms. The glyphs' positions over Glyphs View are based on this DR algorithm.
 
 ### Steps:
-Create a virtual environment in the base folder and install dependencies into venv.
-To run the dashboard, execute below command from base folder path.
+Create a virtual environment in the base folder and install dependencies into venv.\
+To run the dashboard, execute below command from base folder path.\
 `python app.py`
 
 ![Dashboard_SS](https://user-images.githubusercontent.com/19529402/173147494-d04a76b7-9d89-47cf-834c-2fac78391c31.png)
