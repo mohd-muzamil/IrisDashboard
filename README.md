@@ -8,6 +8,9 @@
 
 ### Steps:
 Create a virtual environment in the base folder and install dependencies into venv.\
+`python3 -m venv`\
+`source ./venv/bin/activate`    
+`pip install -r requirements.txt`\
 To run the dashboard, execute below command from base folder path.\
 `python app.py`
 
