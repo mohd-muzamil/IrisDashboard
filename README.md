@@ -6,7 +6,7 @@
   <li>Users can also vary the k-parameter to the K Nearest Neighbours (KNN) algorithm. The cluster value derived using KNN is used to add a stroke colour over the glyph.
   <li>The menu also allows users to choose between t-SNE and PCA dimensionality algorithms. The glyphs' positions over Glyphs View are based on this DR algorithm.
 
-### Steps:
+### Steps(mac):
 Create a virtual environment in the base folder and install dependencies into venv.\
 `python3 -m venv`\
 `source ./venv/bin/activate`    
