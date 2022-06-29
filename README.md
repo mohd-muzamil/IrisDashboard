@@ -1,4 +1,4 @@
-### Explorative dashboard to analyze multidimensional data visually. [Live Demo](https://explorata.herokuapp.com) ![visitors](https://visitor-badge.glitch.me/badge?page_id=mohd-muzamil.IrisDashboard)
+### Explorative dashboard to analyze multidimensional data visually. [demo](https://explorata.herokuapp.com) ![visitors](https://visitor-badge.glitch.me/badge?page_id=mohd-muzamil.IrisDashboard) [video](https://youtu.be/xHMLt8pg9e8)
 
 <ul>
   <li>Two views, i.e. Glyph View and Feature View, allow the user to interact with the dataset and select a specific data point which can then be compared with the remainder of the data points or lasso selected data points.
@@ -16,5 +16,3 @@ To run the dashboard, execute below command from base folder path.\
 `python app.py`
 
 ![Dashboard_SS](https://user-images.githubusercontent.com/19529402/173147494-d04a76b7-9d89-47cf-834c-2fac78391c31.png)
-(https://youtu.be/xHMLt8pg9e8)
-
