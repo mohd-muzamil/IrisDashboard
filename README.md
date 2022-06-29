@@ -1,4 +1,5 @@
-### Explorative dashboard to analyze multidimensional data visually.
+### Explorative dashboard to analyze multidimensional data visually. [Live Demo](https://explorata.herokuapp.com)
+
 <ul>
   <li>Two views, i.e. Glyph View and Feature View, allow the user to interact with the dataset and select a specific data point which can then be compared with the remainder of the data points or lasso selected data points.
   <li>The menu in the sidebar allows the user to choose a few options like type and size of glyphs, hide/show the glyph labels, and hide/show the background grid and option to apply overlap removal.
