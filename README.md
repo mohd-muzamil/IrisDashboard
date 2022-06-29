@@ -1,7 +1,4 @@
-### Explorative dashboard to analyze multidimensional data visually. 
-[demo](https://explorata.herokuapp.com)
-[video](https://youtu.be/xHMLt8pg9e8)
-![visitors](https://visitor-badge.glitch.me/badge?page_id=mohd-muzamil.IrisDashboard) 
+### Explorative dashboard to analyze multidimensional data visually. ![visitors](https://visitor-badge.glitch.me/badge?page_id=mohd-muzamil.IrisDashboard) [demo](https://explorata.herokuapp.com) [video](https://youtu.be/xHMLt8pg9e8)
 
 <ul>
   <li>Two views, i.e. Glyph View and Feature View, allow the user to interact with the dataset and select a specific data point which can then be compared with the remainder of the data points or lasso selected data points.
